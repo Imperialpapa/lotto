@@ -10,6 +10,13 @@
             padding: 20px;
             text-align: center;
         }
+        .method {
+            margin: 20px 0;
+        }
+        .method label {
+            margin: 0 15px;
+            font-size: 16px;
+        }
         button {
             font-size: 18px;
             padding: 15px 30px;
@@ -38,25 +45,41 @@
 </head>
 <body>
     <h1>로또 생성기</h1>
+    <div class="method">
+        <label><input type="radio" name="method" value="90" checked> 90번 방법</label>
+        <label><input type="radio" name="method" value="random"> 랜덤</label>
+    </div>
     <button onclick="generate()">번호 생성</button>
     <div id="result"></div>
 
     <script>
         function generate() {
+            const method = document.querySelector('input[name="method"]:checked').value;
             let result = '';
 
             for (let set = 1; set <= 4; set++) {
-                // 2~90에서 6개 추출
-                let nums = [];
-                while (nums.length < 6) {
-                    let n = Math.floor(Math.random() * 89) + 2; // 2~90
-                    if (!nums.includes(n)) {
-                        nums.push(n);
+                let lottoNums = [];
+
+                if (method === '90') {
+                    // 90번 방법: 2~90에서 6개 추출 후 2로 나누기
+                    let nums = [];
+                    while (nums.length < 6) {
+                        let n = Math.floor(Math.random() * 89) + 2;
+                        if (!nums.includes(n)) {
+                            nums.push(n);
+                        }
+                    }
+                    lottoNums = nums.map(n => Math.floor(n / 2));
+                } else {
+                    // 랜덤: 1~45에서 6개 추출
+                    while (lottoNums.length < 6) {
+                        let n = Math.floor(Math.random() * 45) + 1;
+                        if (!lottoNums.includes(n)) {
+                            lottoNums.push(n);
+                        }
                     }
                 }
 
-                // 2로 나누어 정수화 → 1~45
-                let lottoNums = nums.map(n => Math.floor(n / 2));
                 lottoNums.sort((a, b) => a - b);
 
                 result += `<div class="set"><strong>${set}세트:</strong><br>`;
