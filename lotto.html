@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로또 생성기</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        button {
+            font-size: 18px;
+            padding: 15px 30px;
+            margin: 20px;
+            cursor: pointer;
+        }
+        .set {
+            font-size: 20px;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 8px;
+        }
+        .number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            margin: 5px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>로또 생성기</h1>
+    <button onclick="generate()">번호 생성</button>
+    <div id="result"></div>
+
+    <script>
+        function generate() {
+            let result = '';
+
+            for (let set = 1; set <= 4; set++) {
+                // 2~90에서 6개 추출
+                let nums = [];
+                while (nums.length < 6) {
+                    let n = Math.floor(Math.random() * 89) + 2; // 2~90
+                    if (!nums.includes(n)) {
+                        nums.push(n);
+                    }
+                }
+
+                // 2로 나누어 정수화 → 1~45
+                let lottoNums = nums.map(n => Math.floor(n / 2));
+                lottoNums.sort((a, b) => a - b);
+
+                result += `<div class="set"><strong>${set}세트:</strong><br>`;
+                lottoNums.forEach(n => {
+                    result += `<span class="number">${n}</span>`;
+                });
+                result += '</div>';
+            }
+
+            document.getElementById('result').innerHTML = result;
+        }
+    </script>
+</body>
+</html>
