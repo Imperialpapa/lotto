@@ -151,21 +151,6 @@
             color: #888;
             margin-top: 5px;
         }
-        .result-container {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #e0e0e0;
-            border-radius: 15px;
-            padding: 10px;
-            background: #fafafa;
-        }
-        .result-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .result-container::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 3px;
-        }
 
         /* 반응형 - 태블릿 */
         @media (max-width: 768px) {
@@ -284,9 +269,7 @@
             </div>
         </div>
         <button onclick="generate()">번호 생성</button>
-        <div class="result-container">
-            <div id="result"></div>
-        </div>
+        <div id="result"></div>
     </div>
 
     <script>
