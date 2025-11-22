@@ -31,31 +31,54 @@
         }
         .method {
             margin: 20px 0;
-            text-align: left;
+            text-align: center;
         }
-        .method-item {
-            display: block;
-            padding: 12px 15px;
-            margin: 8px 0;
+        .picker-container {
+            position: relative;
+            height: 150px;
+            overflow: hidden;
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+        .picker-highlight {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            right: 10px;
+            height: 40px;
+            transform: translateY(-50%);
+            background: rgba(102, 126, 234, 0.15);
+            border-radius: 8px;
+            pointer-events: none;
+            border-top: 1px solid rgba(102, 126, 234, 0.3);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        .picker-scroll {
+            height: 100%;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+            padding: 55px 0;
+        }
+        .picker-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .picker-item {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: center;
+            font-size: 16px;
+            color: #999;
+            transition: all 0.2s ease;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
         }
-        .method-item:hover {
-            background: #e9ecef;
-        }
-        .method-item input {
-            margin-right: 10px;
-        }
-        .method-item input:checked + span {
+        .picker-item.active {
+            color: #333;
             font-weight: bold;
-            color: #667eea;
-        }
-        .method-item:has(input:checked) {
-            border-color: #667eea;
-            background: #f0f0ff;
+            font-size: 18px;
         }
         button {
             font-size: 18px;
@@ -214,34 +237,60 @@
     <div class="container">
         <h1>🎱 로또 생성기</h1>
         <div class="method">
-            <label class="method-item">
-                <input type="radio" name="method" value="90" checked>
-                <span>90번 방법</span>
-            </label>
-            <label class="method-item">
-                <input type="radio" name="method" value="random">
-                <span>랜덤</span>
-            </label>
-            <label class="method-item">
-                <input type="radio" name="method" value="oddeven">
-                <span>홀짝 균형 (3:3)</span>
-            </label>
-            <label class="method-item">
-                <input type="radio" name="method" value="highlow">
-                <span>고저 균형 (3:3)</span>
-            </label>
-            <label class="method-item">
-                <input type="radio" name="method" value="section">
-                <span>번호대 분산</span>
-            </label>
+            <div class="picker-container">
+                <div class="picker-highlight"></div>
+                <div class="picker-scroll" id="methodPicker">
+                    <div class="picker-item" data-value="90">90번 방법</div>
+                    <div class="picker-item" data-value="random">랜덤</div>
+                    <div class="picker-item" data-value="oddeven">홀짝 균형 (3:3)</div>
+                    <div class="picker-item" data-value="highlow">고저 균형 (3:3)</div>
+                    <div class="picker-item" data-value="section">번호대 분산</div>
+                </div>
+            </div>
         </div>
         <button onclick="generate()">번호 생성</button>
         <div id="result"></div>
     </div>
 
     <script>
+        // Picker initialization
+        let selectedMethod = '90';
+        const picker = document.getElementById('methodPicker');
+        const items = picker.querySelectorAll('.picker-item');
+
+        function updateActiveItem() {
+            const scrollTop = picker.scrollTop;
+            const itemHeight = 40;
+            const centerIndex = Math.round(scrollTop / itemHeight);
+
+            items.forEach((item, index) => {
+                if (index === centerIndex) {
+                    item.classList.add('active');
+                    selectedMethod = item.dataset.value;
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        picker.addEventListener('scroll', updateActiveItem);
+
+        items.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                picker.scrollTo({
+                    top: index * 40,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Initialize first item as active
+        setTimeout(() => {
+            items[0].classList.add('active');
+        }, 100);
+
         function generate() {
-            const method = document.querySelector('input[name="method"]:checked').value;
+            const method = selectedMethod;
             let result = '';
             const methodNames = {
                 '90': '90번 방법',
