@@ -239,13 +239,7 @@
         <div class="method">
             <div class="picker-container">
                 <div class="picker-highlight"></div>
-                <div class="picker-scroll" id="methodPicker">
-                    <div class="picker-item" data-value="90">90번 방법</div>
-                    <div class="picker-item" data-value="random">랜덤</div>
-                    <div class="picker-item" data-value="oddeven">홀짝 균형 (3:3)</div>
-                    <div class="picker-item" data-value="highlow">고저 균형 (3:3)</div>
-                    <div class="picker-item" data-value="section">번호대 분산</div>
-                </div>
+                <div class="picker-scroll" id="methodPicker"></div>
             </div>
         </div>
         <button onclick="generate()">번호 생성</button>
@@ -253,14 +247,68 @@
     </div>
 
     <script>
-        // Picker initialization
+        // Picker initialization with infinite scroll
         let selectedMethod = '90';
         const picker = document.getElementById('methodPicker');
+        const methods = [
+            { value: '90', label: '90번 방법' },
+            { value: 'random', label: '랜덤' },
+            { value: 'oddeven', label: '홀짝 균형 (3:3)' },
+            { value: 'highlow', label: '고저 균형 (3:3)' },
+            { value: 'section', label: '번호대 분산' }
+        ];
+        const itemHeight = 40;
+        const itemCount = methods.length;
+        const cloneCount = 3; // 앞뒤로 복제할 개수
+
+        // 무한 스크롤을 위한 아이템 생성
+        function createPickerItems() {
+            picker.innerHTML = '';
+
+            // 앞에 복제 (마지막 몇 개)
+            for (let i = itemCount - cloneCount; i < itemCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'picker-item clone';
+                div.dataset.value = methods[i].value;
+                div.dataset.realIndex = i;
+                div.textContent = methods[i].label;
+                picker.appendChild(div);
+            }
+
+            // 원본 아이템
+            methods.forEach((method, i) => {
+                const div = document.createElement('div');
+                div.className = 'picker-item';
+                div.dataset.value = method.value;
+                div.dataset.realIndex = i;
+                div.textContent = method.label;
+                picker.appendChild(div);
+            });
+
+            // 뒤에 복제 (처음 몇 개)
+            for (let i = 0; i < cloneCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'picker-item clone';
+                div.dataset.value = methods[i].value;
+                div.dataset.realIndex = i;
+                div.textContent = methods[i].label;
+                picker.appendChild(div);
+            }
+        }
+
+        createPickerItems();
         const items = picker.querySelectorAll('.picker-item');
+
+        // 초기 위치 설정 (첫 번째 원본 아이템)
+        setTimeout(() => {
+            picker.scrollTop = cloneCount * itemHeight;
+            updateActiveItem();
+        }, 50);
+
+        let isScrolling = false;
 
         function updateActiveItem() {
             const scrollTop = picker.scrollTop;
-            const itemHeight = 40;
             const centerIndex = Math.round(scrollTop / itemHeight);
 
             items.forEach((item, index) => {
@@ -273,21 +321,41 @@
             });
         }
 
-        picker.addEventListener('scroll', updateActiveItem);
+        function handleInfiniteScroll() {
+            if (isScrolling) return;
+
+            const scrollTop = picker.scrollTop;
+            const maxScroll = (cloneCount + itemCount) * itemHeight;
+            const minScroll = cloneCount * itemHeight;
+
+            // 위쪽 끝에 도달
+            if (scrollTop < (cloneCount - 1) * itemHeight) {
+                isScrolling = true;
+                picker.scrollTop = scrollTop + itemCount * itemHeight;
+                setTimeout(() => isScrolling = false, 50);
+            }
+            // 아래쪽 끝에 도달
+            else if (scrollTop > (cloneCount + itemCount - 1) * itemHeight) {
+                isScrolling = true;
+                picker.scrollTop = scrollTop - itemCount * itemHeight;
+                setTimeout(() => isScrolling = false, 50);
+            }
+
+            updateActiveItem();
+        }
+
+        picker.addEventListener('scroll', handleInfiniteScroll);
 
         items.forEach((item, index) => {
             item.addEventListener('click', () => {
+                const realIndex = parseInt(item.dataset.realIndex);
+                const targetScroll = (cloneCount + realIndex) * itemHeight;
                 picker.scrollTo({
-                    top: index * 40,
+                    top: targetScroll,
                     behavior: 'smooth'
                 });
             });
         });
-
-        // Initialize first item as active
-        setTimeout(() => {
-            items[0].classList.add('active');
-        }, 100);
 
         function generate() {
             const method = selectedMethod;
