@@ -33,13 +33,27 @@
             margin: 20px 0;
             text-align: center;
         }
+        .picker-row {
+            display: flex;
+            gap: 10px;
+        }
+        .picker-wrapper {
+            flex: 1;
+        }
+        .picker-wrapper.small {
+            flex: 0 0 80px;
+        }
+        .picker-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
         .picker-container {
             position: relative;
             height: 150px;
             overflow: hidden;
             background: #f8f9fa;
             border-radius: 15px;
-            margin: 10px 0;
         }
         .picker-highlight {
             position: absolute;
@@ -237,9 +251,21 @@
     <div class="container">
         <h1>🎱 로또 생성기</h1>
         <div class="method">
-            <div class="picker-container">
-                <div class="picker-highlight"></div>
-                <div class="picker-scroll" id="methodPicker"></div>
+            <div class="picker-row">
+                <div class="picker-wrapper">
+                    <div class="picker-label">생성 방법</div>
+                    <div class="picker-container">
+                        <div class="picker-highlight"></div>
+                        <div class="picker-scroll" id="methodPicker"></div>
+                    </div>
+                </div>
+                <div class="picker-wrapper small">
+                    <div class="picker-label">세트</div>
+                    <div class="picker-container">
+                        <div class="picker-highlight"></div>
+                        <div class="picker-scroll" id="setCountPicker"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <button onclick="generate()">번호 생성</button>
@@ -247,9 +273,106 @@
     </div>
 
     <script>
-        // Picker initialization with infinite scroll
+        // Circular Picker Factory
+        function createCircularPicker(elementId, options, defaultIndex, onSelect) {
+            const picker = document.getElementById(elementId);
+            const itemHeight = 40;
+            const itemCount = options.length;
+            const cloneCount = 3;
+            let selectedValue = options[defaultIndex].value;
+            let isScrolling = false;
+
+            // 아이템 생성
+            picker.innerHTML = '';
+
+            // 앞에 복제
+            for (let i = itemCount - cloneCount; i < itemCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'picker-item clone';
+                div.dataset.value = options[i].value;
+                div.dataset.realIndex = i;
+                div.textContent = options[i].label;
+                picker.appendChild(div);
+            }
+
+            // 원본
+            options.forEach((opt, i) => {
+                const div = document.createElement('div');
+                div.className = 'picker-item';
+                div.dataset.value = opt.value;
+                div.dataset.realIndex = i;
+                div.textContent = opt.label;
+                picker.appendChild(div);
+            });
+
+            // 뒤에 복제
+            for (let i = 0; i < cloneCount; i++) {
+                const div = document.createElement('div');
+                div.className = 'picker-item clone';
+                div.dataset.value = options[i].value;
+                div.dataset.realIndex = i;
+                div.textContent = options[i].label;
+                picker.appendChild(div);
+            }
+
+            const items = picker.querySelectorAll('.picker-item');
+
+            function updateActive() {
+                const scrollTop = picker.scrollTop;
+                const centerIndex = Math.round(scrollTop / itemHeight);
+
+                items.forEach((item, index) => {
+                    if (index === centerIndex) {
+                        item.classList.add('active');
+                        selectedValue = item.dataset.value;
+                        onSelect(selectedValue);
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+            }
+
+            function handleScroll() {
+                if (isScrolling) return;
+
+                const scrollTop = picker.scrollTop;
+
+                if (scrollTop < (cloneCount - 1) * itemHeight) {
+                    isScrolling = true;
+                    picker.scrollTop = scrollTop + itemCount * itemHeight;
+                    setTimeout(() => isScrolling = false, 50);
+                } else if (scrollTop > (cloneCount + itemCount - 1) * itemHeight) {
+                    isScrolling = true;
+                    picker.scrollTop = scrollTop - itemCount * itemHeight;
+                    setTimeout(() => isScrolling = false, 50);
+                }
+
+                updateActive();
+            }
+
+            picker.addEventListener('scroll', handleScroll);
+
+            items.forEach((item) => {
+                item.addEventListener('click', () => {
+                    const realIndex = parseInt(item.dataset.realIndex);
+                    picker.scrollTo({
+                        top: (cloneCount + realIndex) * itemHeight,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // 초기 위치
+            setTimeout(() => {
+                picker.scrollTop = (cloneCount + defaultIndex) * itemHeight;
+                updateActive();
+            }, 50);
+
+            return () => selectedValue;
+        }
+
+        // 방법 피커
         let selectedMethod = '90';
-        const picker = document.getElementById('methodPicker');
         const methods = [
             { value: '90', label: '90번 방법' },
             { value: 'random', label: '랜덤' },
@@ -257,105 +380,15 @@
             { value: 'highlow', label: '고저 균형 (3:3)' },
             { value: 'section', label: '번호대 분산' }
         ];
-        const itemHeight = 40;
-        const itemCount = methods.length;
-        const cloneCount = 3; // 앞뒤로 복제할 개수
+        createCircularPicker('methodPicker', methods, 0, (val) => selectedMethod = val);
 
-        // 무한 스크롤을 위한 아이템 생성
-        function createPickerItems() {
-            picker.innerHTML = '';
-
-            // 앞에 복제 (마지막 몇 개)
-            for (let i = itemCount - cloneCount; i < itemCount; i++) {
-                const div = document.createElement('div');
-                div.className = 'picker-item clone';
-                div.dataset.value = methods[i].value;
-                div.dataset.realIndex = i;
-                div.textContent = methods[i].label;
-                picker.appendChild(div);
-            }
-
-            // 원본 아이템
-            methods.forEach((method, i) => {
-                const div = document.createElement('div');
-                div.className = 'picker-item';
-                div.dataset.value = method.value;
-                div.dataset.realIndex = i;
-                div.textContent = method.label;
-                picker.appendChild(div);
-            });
-
-            // 뒤에 복제 (처음 몇 개)
-            for (let i = 0; i < cloneCount; i++) {
-                const div = document.createElement('div');
-                div.className = 'picker-item clone';
-                div.dataset.value = methods[i].value;
-                div.dataset.realIndex = i;
-                div.textContent = methods[i].label;
-                picker.appendChild(div);
-            }
+        // 세트 수 피커
+        let selectedSetCount = 4;
+        const setCounts = [];
+        for (let i = 1; i <= 10; i++) {
+            setCounts.push({ value: i, label: i + '세트' });
         }
-
-        createPickerItems();
-        const items = picker.querySelectorAll('.picker-item');
-
-        // 초기 위치 설정 (첫 번째 원본 아이템)
-        setTimeout(() => {
-            picker.scrollTop = cloneCount * itemHeight;
-            updateActiveItem();
-        }, 50);
-
-        let isScrolling = false;
-
-        function updateActiveItem() {
-            const scrollTop = picker.scrollTop;
-            const centerIndex = Math.round(scrollTop / itemHeight);
-
-            items.forEach((item, index) => {
-                if (index === centerIndex) {
-                    item.classList.add('active');
-                    selectedMethod = item.dataset.value;
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-        }
-
-        function handleInfiniteScroll() {
-            if (isScrolling) return;
-
-            const scrollTop = picker.scrollTop;
-            const maxScroll = (cloneCount + itemCount) * itemHeight;
-            const minScroll = cloneCount * itemHeight;
-
-            // 위쪽 끝에 도달
-            if (scrollTop < (cloneCount - 1) * itemHeight) {
-                isScrolling = true;
-                picker.scrollTop = scrollTop + itemCount * itemHeight;
-                setTimeout(() => isScrolling = false, 50);
-            }
-            // 아래쪽 끝에 도달
-            else if (scrollTop > (cloneCount + itemCount - 1) * itemHeight) {
-                isScrolling = true;
-                picker.scrollTop = scrollTop - itemCount * itemHeight;
-                setTimeout(() => isScrolling = false, 50);
-            }
-
-            updateActiveItem();
-        }
-
-        picker.addEventListener('scroll', handleInfiniteScroll);
-
-        items.forEach((item, index) => {
-            item.addEventListener('click', () => {
-                const realIndex = parseInt(item.dataset.realIndex);
-                const targetScroll = (cloneCount + realIndex) * itemHeight;
-                picker.scrollTo({
-                    top: targetScroll,
-                    behavior: 'smooth'
-                });
-            });
-        });
+        createCircularPicker('setCountPicker', setCounts, 3, (val) => selectedSetCount = parseInt(val));
 
         function generate() {
             const method = selectedMethod;
@@ -368,7 +401,7 @@
                 'section': '번호대 분산'
             };
 
-            for (let set = 1; set <= 4; set++) {
+            for (let set = 1; set <= selectedSetCount; set++) {
                 let lottoNums = [];
 
                 if (method === '90') {
