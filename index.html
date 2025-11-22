@@ -5,88 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로또 생성기</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             padding: 20px;
             text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 28px;
         }
         .method {
             margin: 20px 0;
+            text-align: left;
         }
-        .method label {
-            margin: 0 15px;
-            font-size: 16px;
+        .method-item {
+            display: block;
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .method-item:hover {
+            background: #e9ecef;
+        }
+        .method-item input {
+            margin-right: 10px;
+        }
+        .method-item input:checked + span {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .method-item:has(input:checked) {
+            border-color: #667eea;
+            background: #f0f0ff;
         }
         button {
             font-size: 18px;
-            padding: 15px 30px;
-            margin: 20px;
+            padding: 15px 40px;
+            margin: 25px 0;
             cursor: pointer;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        button:active {
+            transform: translateY(0);
         }
         .set {
-            font-size: 20px;
+            font-size: 18px;
             margin: 15px 0;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 8px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            text-align: left;
+        }
+        .set strong {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        .numbers {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
         .number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            margin: 5px;
-            background: #4CAF50;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border-radius: 50%;
             font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        .method-name {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>로또 생성기</h1>
-    <div class="method">
-        <label><input type="radio" name="method" value="90" checked> 90번 방법</label>
-        <label><input type="radio" name="method" value="random"> 랜덤</label>
+    <div class="container">
+        <h1>🎱 로또 생성기</h1>
+        <div class="method">
+            <label class="method-item">
+                <input type="radio" name="method" value="90" checked>
+                <span>90번 방법</span>
+            </label>
+            <label class="method-item">
+                <input type="radio" name="method" value="random">
+                <span>랜덤</span>
+            </label>
+            <label class="method-item">
+                <input type="radio" name="method" value="oddeven">
+                <span>홀짝 균형 (3:3)</span>
+            </label>
+            <label class="method-item">
+                <input type="radio" name="method" value="highlow">
+                <span>고저 균형 (3:3)</span>
+            </label>
+            <label class="method-item">
+                <input type="radio" name="method" value="section">
+                <span>번호대 분산</span>
+            </label>
+        </div>
+        <button onclick="generate()">번호 생성</button>
+        <div id="result"></div>
     </div>
-    <button onclick="generate()">번호 생성</button>
-    <div id="result"></div>
 
     <script>
         function generate() {
             const method = document.querySelector('input[name="method"]:checked').value;
             let result = '';
+            const methodNames = {
+                '90': '90번 방법',
+                'random': '랜덤',
+                'oddeven': '홀짝 균형',
+                'highlow': '고저 균형',
+                'section': '번호대 분산'
+            };
 
             for (let set = 1; set <= 4; set++) {
                 let lottoNums = [];
 
                 if (method === '90') {
-                    // 90번 방법: 2~90에서 6개 추출 후 2로 나누기
                     let nums = [];
                     while (nums.length < 6) {
                         let n = Math.floor(Math.random() * 89) + 2;
-                        if (!nums.includes(n)) {
-                            nums.push(n);
-                        }
+                        if (!nums.includes(n)) nums.push(n);
                     }
                     lottoNums = nums.map(n => Math.floor(n / 2));
-                } else {
-                    // 랜덤: 1~45에서 6개 추출
+                } else if (method === 'random') {
                     while (lottoNums.length < 6) {
                         let n = Math.floor(Math.random() * 45) + 1;
-                        if (!lottoNums.includes(n)) {
-                            lottoNums.push(n);
-                        }
+                        if (!lottoNums.includes(n)) lottoNums.push(n);
                     }
+                } else if (method === 'oddeven') {
+                    // 홀짝 균형: 홀수 3개, 짝수 3개
+                    let odds = [], evens = [];
+                    while (odds.length < 3) {
+                        let n = Math.floor(Math.random() * 23) * 2 + 1; // 1,3,5,...,45
+                        if (n <= 45 && !odds.includes(n)) odds.push(n);
+                    }
+                    while (evens.length < 3) {
+                        let n = Math.floor(Math.random() * 22) * 2 + 2; // 2,4,6,...,44
+                        if (!evens.includes(n)) evens.push(n);
+                    }
+                    lottoNums = [...odds, ...evens];
+                } else if (method === 'highlow') {
+                    // 고저 균형: 저번호(1-22) 3개, 고번호(23-45) 3개
+                    let lows = [], highs = [];
+                    while (lows.length < 3) {
+                        let n = Math.floor(Math.random() * 22) + 1;
+                        if (!lows.includes(n)) lows.push(n);
+                    }
+                    while (highs.length < 3) {
+                        let n = Math.floor(Math.random() * 23) + 23;
+                        if (!highs.includes(n)) highs.push(n);
+                    }
+                    lottoNums = [...lows, ...highs];
+                } else if (method === 'section') {
+                    // 번호대 분산: 각 구간에서 1개씩 + 랜덤 1개
+                    const sections = [
+                        [1, 9], [10, 19], [20, 29], [30, 39], [40, 45]
+                    ];
+                    sections.forEach(([min, max]) => {
+                        let n;
+                        do {
+                            n = Math.floor(Math.random() * (max - min + 1)) + min;
+                        } while (lottoNums.includes(n));
+                        lottoNums.push(n);
+                    });
+                    // 6번째는 전체에서 랜덤
+                    let extra;
+                    do {
+                        extra = Math.floor(Math.random() * 45) + 1;
+                    } while (lottoNums.includes(extra));
+                    lottoNums.push(extra);
                 }
 
                 lottoNums.sort((a, b) => a - b);
 
-                result += `<div class="set"><strong>${set}세트:</strong><br>`;
+                result += `<div class="set">
+                    <strong>${set}세트</strong>
+                    <div class="numbers">`;
                 lottoNums.forEach(n => {
                     result += `<span class="number">${n}</span>`;
                 });
-                result += '</div>';
+                result += `</div>
+                    <div class="method-name">${methodNames[method]}</div>
+                </div>`;
             }
 
             document.getElementById('result').innerHTML = result;
