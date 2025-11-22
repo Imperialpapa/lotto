@@ -123,9 +123,15 @@
             text-align: left;
         }
         .set strong {
-            display: block;
-            margin-bottom: 10px;
+            display: inline;
+            margin-right: 15px;
             color: #555;
+        }
+        .set-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
         .numbers {
             display: flex;
@@ -480,13 +486,15 @@
                 lottoNums.sort((a, b) => a - b);
 
                 result += `<div class="set">
-                    <strong>${set}세트</strong>
+                    <div class="set-header">
+                        <strong>${set}세트</strong>
+                        <span class="method-name">${methodNames[method]}</span>
+                    </div>
                     <div class="numbers">`;
                 lottoNums.forEach(n => {
                     result += `<span class="number">${n}</span>`;
                 });
                 result += `</div>
-                    <div class="method-name">${methodNames[method]}</div>
                 </div>`;
             }
 
