@@ -454,39 +454,37 @@
                 let lottoNums = [];
 
                 if (method === '90') {
-                    let nums = [];
-                    while (nums.length < 6) {
-                        let n = Math.floor(Math.random() * 89) + 2;
-                        if (!nums.includes(n)) nums.push(n);
+                    let nums = new Set();
+                    while (nums.size < 6) {
+                        nums.add(Math.floor(Math.random() * 89) + 2);
                     }
-                    lottoNums = nums.map(n => Math.floor(n / 2));
+                    lottoNums = Array.from(nums).map(n => Math.ceil(n / 2));
                 } else if (method === 'random') {
-                    while (lottoNums.length < 6) {
-                        let n = Math.floor(Math.random() * 45) + 1;
-                        if (!lottoNums.includes(n)) lottoNums.push(n);
+                    let nums = new Set();
+                    while (nums.size < 6) {
+                        nums.add(Math.floor(Math.random() * 45) + 1);
                     }
+                    lottoNums = Array.from(nums);
                 } else if (method === 'oddeven') {
                     // 홀짝 균형: 홀수 3개, 짝수 3개
-                    let odds = [], evens = [];
-                    while (odds.length < 3) {
+                    let odds = new Set(), evens = new Set();
+                    while (odds.size < 3) {
                         let n = Math.floor(Math.random() * 23) * 2 + 1; // 1,3,5,...,45
-                        if (n <= 45 && !odds.includes(n)) odds.push(n);
+                        if (n <= 45) odds.add(n);
                     }
-                    while (evens.length < 3) {
+                    while (evens.size < 3) {
                         let n = Math.floor(Math.random() * 22) * 2 + 2; // 2,4,6,...,44
-                        if (!evens.includes(n)) evens.push(n);
+                        evens.add(n);
                     }
                     lottoNums = [...odds, ...evens];
                 } else if (method === 'highlow') {
                     // 고저 균형: 저번호(1-22) 3개, 고번호(23-45) 3개
-                    let lows = [], highs = [];
-                    while (lows.length < 3) {
-                        let n = Math.floor(Math.random() * 22) + 1;
-                        if (!lows.includes(n)) lows.push(n);
+                    let lows = new Set(), highs = new Set();
+                    while (lows.size < 3) {
+                        lows.add(Math.floor(Math.random() * 22) + 1);
                     }
-                    while (highs.length < 3) {
-                        let n = Math.floor(Math.random() * 23) + 23;
-                        if (!highs.includes(n)) highs.push(n);
+                    while (highs.size < 3) {
+                        highs.add(Math.floor(Math.random() * 23) + 23);
                     }
                     lottoNums = [...lows, ...highs];
                 } else if (method === 'section') {
@@ -494,39 +492,41 @@
                     const sections = [
                         [1, 9], [10, 19], [20, 29], [30, 39], [40, 45]
                     ];
+                    const usedNumbers = new Set();
                     sections.forEach(([min, max]) => {
                         let n;
                         do {
                             n = Math.floor(Math.random() * (max - min + 1)) + min;
-                        } while (lottoNums.includes(n));
+                        } while (usedNumbers.has(n));
+                        usedNumbers.add(n);
                         lottoNums.push(n);
                     });
                     // 6번째는 전체에서 랜덤
                     let extra;
                     do {
                         extra = Math.floor(Math.random() * 45) + 1;
-                    } while (lottoNums.includes(extra));
+                    } while (usedNumbers.has(extra));
                     lottoNums.push(extra);
                 }
 
                 lottoNums.sort((a, b) => a - b);
+
+                const getRange = (n) => {
+                    if (n <= 10) return '1';
+                    if (n <= 20) return '2';
+                    if (n <= 30) return '3';
+                    if (n <= 40) return '4';
+                    return '5';
+                };
 
                 result += `<div class="set">
                     <div class="set-header">
                         <strong>${set}세트</strong>
                         <span class="method-name">${methodNames[method]}</span>
                     </div>
-                    <div class="numbers">`;
-                lottoNums.forEach(n => {
-                    let range;
-                    if (n <= 10) range = '1';
-                    else if (n <= 20) range = '2';
-                    else if (n <= 30) range = '3';
-                    else if (n <= 40) range = '4';
-                    else range = '5';
-                    result += `<span class="number" data-range="${range}">${n}</span>`;
-                });
-                result += `</div>
+                    <div class="numbers">
+                        ${lottoNums.map(n => `<span class="number" data-range="${getRange(n)}">${n}</span>`).join('')}
+                    </div>
                 </div>`;
             }
 
