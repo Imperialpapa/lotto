@@ -456,9 +456,10 @@
                 if (method === '90') {
                     let nums = new Set();
                     while (nums.size < 6) {
-                        nums.add(Math.floor(Math.random() * 89) + 2);
+                        let n = Math.floor(Math.random() * 89) + 2;
+                        nums.add(Math.ceil(n / 2));
                     }
-                    lottoNums = Array.from(nums).map(n => Math.ceil(n / 2));
+                    lottoNums = Array.from(nums);
                 } else if (method === 'random') {
                     let nums = new Set();
                     while (nums.size < 6) {
