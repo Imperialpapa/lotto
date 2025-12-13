@@ -292,6 +292,29 @@
                 margin: 10px 0;
             }
         }
+
+        /* 후원 계좌 정보 */
+        .sponsor-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #fff9e6 0%, #ffe8cc 100%);
+            border-radius: 12px;
+            border: 2px solid #ffd699;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #555;
+            box-shadow: 0 4px 10px rgba(255, 214, 153, 0.3);
+        }
+        .sponsor-info div:first-child {
+            font-weight: bold;
+            color: #333;
+        }
+        .sponsor-info div:last-child {
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
@@ -318,6 +341,10 @@
         <button onclick="generate()">번호 생성</button>
         <div class="result-container">
             <div id="result"></div>
+        </div>
+        <div class="sponsor-info">
+            <div>후원 계좌: 카카오 뱅크 3333-35-8084358</div>
+            <div>에듀크립트 솔루션즈</div>
         </div>
     </div>
 
