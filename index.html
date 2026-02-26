@@ -8,484 +8,291 @@
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f0f4ff;
+            --bg: #edf1fb;
             --card: #ffffff;
-            --surface: #f7f8fc;
+            --surface: #f4f6fd;
             --border: rgba(0,0,0,0.06);
-            --primary: #5b6ef5;
-            --primary-light: #8b97ff;
-            --primary-pale: #eef0ff;
-            --accent-pink: #ff6b9d;
-            --accent-orange: #ff9a56;
-            --accent-green: #2dd4a8;
-            --accent-cyan: #38c9ff;
-            --text: #1a1d2e;
-            --text2: #5a5d72;
-            --text3: #9a9db2;
-            --shadow-sm: 0 2px 8px rgba(91,110,245,0.08);
-            --shadow-md: 0 4px 20px rgba(91,110,245,0.12);
-            --shadow-lg: 0 8px 40px rgba(91,110,245,0.15);
-            --safe-b: env(safe-area-inset-bottom, 0px);
-            --safe-l: env(safe-area-inset-left, 0px);
-            --safe-r: env(safe-area-inset-right, 0px);
+            --pri: #5b6ef5;
+            --pri-lt: #8b97ff;
+            --pri-pale: #e8ebff;
+            --pink: #ff6b9d;
+            --orange: #ff9a56;
+            --green: #2dd4a8;
+            --cyan: #38c9ff;
+            --t1: #1a1d2e;
+            --t2: #484b60;
+            --t3: #888ba0;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html{height:100%;overflow:hidden}
+        body{
+            font-family:'Noto Sans KR',-apple-system,sans-serif;
+            background:var(--bg);color:var(--t1);
+            height:100%;height:100dvh;overflow:hidden;
+            -webkit-font-smoothing:antialiased;
+            -webkit-tap-highlight-color:transparent;
+            user-select:none;-webkit-user-select:none;
+        }
+        /* BG Blobs */
+        body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(80px);opacity:.45;pointer-events:none;z-index:0;animation:blob 14s ease-in-out infinite alternate}
+        body::before{width:55vw;height:55vw;top:-12%;left:-12%;background:radial-gradient(circle,rgba(91,110,245,.28),transparent 70%)}
+        body::after{width:50vw;height:50vw;bottom:-8%;right:-12%;background:radial-gradient(circle,rgba(255,107,157,.22),transparent 70%);animation-delay:-7s;animation-direction:alternate-reverse}
+        @keyframes blob{0%{transform:translate(0,0) scale(1)}100%{transform:translate(25px,-18px) scale(1.08)}}
+
+        #confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
+
+        /* ===== LAYOUT ===== */
+        .app{
+            position:relative;z-index:1;
+            height:100%;height:100dvh;
+            display:flex;flex-direction:column;
+            max-width:560px;margin:0 auto;
+            padding:0;
+            padding-bottom:env(safe-area-inset-bottom,0);
+            padding-left:max(6px,env(safe-area-inset-left,0));
+            padding-right:max(6px,env(safe-area-inset-right,0));
         }
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { font-size: 16px; height: 100%; overflow: hidden; }
+        /* ===== HEADER ===== */
+        .hdr{text-align:center;padding:10px 0 6px;flex-shrink:0}
+        .hdr h1{
+            font-family:'Black Han Sans',sans-serif;
+            font-size:clamp(1.8rem,7vw,2.6rem);
+            background:linear-gradient(135deg,var(--pri),var(--pink),var(--orange));
+            -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+            background-clip:text;letter-spacing:3px;line-height:1.1;
+            animation:shimmer 4s ease-in-out infinite;background-size:200% 200%;
+        }
+        @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+        .hdr .sub{font-size:.75rem;color:var(--t3);margin-top:2px;letter-spacing:3px;font-weight:400}
 
-        body {
-            font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            height: 100%; height: 100dvh;
-            overflow: hidden;
-            -webkit-font-smoothing: antialiased;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none; -webkit-user-select: none;
+        /* ===== CATEGORY TABS ===== */
+        .cats{
+            display:flex;gap:7px;flex-shrink:0;
+            overflow-x:auto;scrollbar-width:none;
+            padding:6px 8px;margin-bottom:6px;
         }
+        .cats::-webkit-scrollbar{display:none}
+        .cat{
+            flex-shrink:0;padding:9px 16px;
+            border-radius:22px;border:1.5px solid var(--border);
+            background:var(--card);color:var(--t2);
+            font-size:.88rem;font-weight:600;
+            font-family:'Noto Sans KR',sans-serif;
+            cursor:pointer;white-space:nowrap;
+            transition:all .25s cubic-bezier(.34,1.56,.64,1);
+            box-shadow:0 2px 8px rgba(91,110,245,.08);
+        }
+        .cat.active{
+            background:linear-gradient(135deg,var(--pri),var(--pri-lt));
+            color:#fff;border-color:transparent;
+            box-shadow:0 4px 18px rgba(91,110,245,.35);
+            transform:scale(1.05);
+        }
+        .cat:active{transform:scale(.95)}
 
-        /* === ANIMATED BG BLOBS === */
-        body::before, body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            pointer-events: none;
-            z-index: 0;
-            animation: blobFloat 12s ease-in-out infinite alternate;
+        /* ===== CONTROLS ===== */
+        .ctrl{
+            flex-shrink:0;background:var(--card);
+            border-radius:20px;padding:14px 12px;
+            box-shadow:0 4px 20px rgba(91,110,245,.1);
+            margin:0 6px 8px;border:1px solid var(--border);
         }
-        body::before {
-            width: 50vw; height: 50vw;
-            top: -10%; left: -10%;
-            background: radial-gradient(circle, rgba(91,110,245,0.25), transparent 70%);
+        .pk-row{display:flex;gap:10px}
+        .pk-wrap{flex:1;min-width:0}
+        .pk-wrap.sm{flex:0 0 84px}
+        .pk-lbl{font-size:.75rem;color:var(--t3);margin-bottom:4px;font-weight:600;padding-left:4px;letter-spacing:1px}
+        .pk-box{
+            position:relative;height:130px;overflow:hidden;
+            background:var(--surface);border-radius:14px;
+            border:1px solid var(--border);
         }
-        body::after {
-            width: 45vw; height: 45vw;
-            bottom: -5%; right: -10%;
-            background: radial-gradient(circle, rgba(255,107,157,0.2), transparent 70%);
-            animation-delay: -6s;
-            animation-direction: alternate-reverse;
+        .pk-hl{
+            position:absolute;top:50%;left:5px;right:5px;
+            height:42px;transform:translateY(-50%);
+            background:linear-gradient(90deg,var(--pri-pale),rgba(91,110,245,.04));
+            border-radius:10px;pointer-events:none;
+            border:1.5px solid rgba(91,110,245,.2);
         }
-        @keyframes blobFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(30px, -20px) scale(1.1); }
+        .pk-scroll{
+            height:100%;overflow-y:scroll;
+            scroll-snap-type:y mandatory;
+            -webkit-overflow-scrolling:touch;
+            padding:44px 0;
         }
-
-        /* === CONFETTI CANVAS === */
-        #confetti {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 100;
+        .pk-scroll::-webkit-scrollbar{display:none}
+        .pk-item{
+            height:42px;display:flex;align-items:center;justify-content:center;
+            scroll-snap-align:center;
+            font-size:.92rem;color:var(--t3);
+            transition:all .15s ease;cursor:pointer;padding:0 6px;
         }
-
-        /* === LAYOUT === */
-        .app {
-            position: relative; z-index: 1;
-            height: 100%; height: 100dvh;
-            display: flex; flex-direction: column;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 0 8px;
-            padding-bottom: var(--safe-b);
-            padding-left: max(8px, var(--safe-l));
-            padding-right: max(8px, var(--safe-r));
-        }
-
-        /* === HEADER === */
-        .hdr {
-            text-align: center;
-            padding: 14px 0 8px;
-            flex-shrink: 0;
-        }
-        .hdr h1 {
-            font-family: 'Black Han Sans', sans-serif;
-            font-size: clamp(1.5rem, 5.5vw, 2.2rem);
-            background: linear-gradient(135deg, var(--primary), var(--accent-pink), var(--accent-orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: 2px;
-            line-height: 1.1;
-            animation: titleShimmer 4s ease-in-out infinite;
-            background-size: 200% 200%;
-        }
-        @keyframes titleShimmer {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        .hdr .sub {
-            font-size: 0.62rem;
-            color: var(--text3);
-            margin-top: 2px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-weight: 400;
+        .pk-item.active{color:var(--pri);font-weight:800;font-size:1.02rem}
+        .m-desc{
+            margin-top:10px;padding:10px 14px;
+            background:var(--pri-pale);border-radius:10px;
+            border-left:3px solid var(--pri);
+            font-size:.82rem;color:var(--t2);line-height:1.5;
         }
 
-        /* === CATEGORY TABS === */
-        .cats {
-            display: flex; gap: 6px; flex-shrink: 0;
-            overflow-x: auto; scrollbar-width: none;
-            padding: 4px 2px; margin-bottom: 8px;
+        /* ===== GENERATE BUTTON ===== */
+        .gen{
+            flex-shrink:0;display:block;width:calc(100% - 12px);
+            padding:18px;margin:0 6px 8px;border:none;
+            border-radius:16px;
+            background:linear-gradient(135deg,var(--pri),var(--pri-lt),var(--cyan));
+            background-size:200% 200%;color:#fff;
+            font-family:'Black Han Sans',sans-serif;
+            font-size:clamp(1.2rem,4.5vw,1.5rem);letter-spacing:5px;
+            cursor:pointer;position:relative;overflow:hidden;
+            box-shadow:0 6px 28px rgba(91,110,245,.35);
+            animation:pulse 3s ease-in-out infinite;
+            transition:all .2s ease;
         }
-        .cats::-webkit-scrollbar { display: none; }
-        .cat {
-            flex-shrink: 0;
-            padding: 7px 15px;
-            border-radius: 20px;
-            border: 1.5px solid var(--border);
-            background: var(--card);
-            color: var(--text2);
-            font-size: 0.72rem;
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-            white-space: nowrap;
-            box-shadow: var(--shadow-sm);
+        @keyframes pulse{
+            0%,100%{background-position:0% 50%;box-shadow:0 6px 28px rgba(91,110,245,.35)}
+            50%{background-position:100% 50%;box-shadow:0 6px 34px rgba(56,201,255,.35)}
         }
-        .cat.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: #fff;
-            border-color: transparent;
-            box-shadow: 0 4px 16px rgba(91,110,245,0.35);
-            transform: scale(1.05);
-        }
-        .cat:active { transform: scale(0.95); }
+        .gen::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s ease}
+        .gen:active{transform:scale(.96);box-shadow:0 3px 14px rgba(91,110,245,.3)}
+        .gen.done{background:linear-gradient(135deg,var(--green),#1ad4a0)!important;box-shadow:0 6px 28px rgba(45,212,168,.4)!important;animation:none}
+        .gen.shimmer::before{left:100%}
 
-        /* === CONTROLS === */
-        .ctrl {
-            flex-shrink: 0;
-            background: var(--card);
-            border-radius: 18px;
-            padding: 12px;
-            box-shadow: var(--shadow-md);
-            margin-bottom: 8px;
-            border: 1px solid var(--border);
+        /* ===== RESULTS ===== */
+        .res{
+            flex:1;min-height:0;
+            background:var(--card);border-radius:20px;
+            box-shadow:0 4px 20px rgba(91,110,245,.1);
+            border:1px solid var(--border);
+            display:flex;flex-direction:column;overflow:hidden;
+            margin:0 6px 6px;
         }
-        .pk-row { display: flex; gap: 8px; }
-        .pk-wrap { flex: 1; min-width: 0; }
-        .pk-wrap.sm { flex: 0 0 76px; }
-        .pk-lbl {
-            font-size: 0.6rem;
-            color: var(--text3);
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 600;
-            padding-left: 4px;
+        .res-top{
+            padding:10px 16px;display:flex;
+            justify-content:space-between;align-items:center;
+            border-bottom:1px solid var(--border);flex-shrink:0;
+            background:var(--surface);
         }
-        .pk-box {
-            position: relative;
-            height: 120px;
-            overflow: hidden;
-            background: var(--surface);
-            border-radius: 14px;
-            border: 1px solid var(--border);
+        .res-top span{font-size:.82rem;color:var(--t3);font-weight:700;letter-spacing:1px}
+        .clr-btn{
+            background:var(--card);border:1px solid var(--border);
+            color:var(--t3);font-size:.78rem;padding:6px 14px;
+            border-radius:12px;cursor:pointer;
+            font-family:'Noto Sans KR',sans-serif;font-weight:600;
+            transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.04);
         }
-        .pk-hl {
-            position: absolute;
-            top: 50%; left: 5px; right: 5px;
-            height: 36px;
-            transform: translateY(-50%);
-            background: linear-gradient(90deg, var(--primary-pale), rgba(91,110,245,0.06));
-            border-radius: 10px;
-            pointer-events: none;
-            border: 1.5px solid rgba(91,110,245,0.2);
+        .clr-btn:active{background:#fee;color:var(--pink);border-color:var(--pink)}
+
+        .res-scroll{
+            flex:1;overflow-y:auto;padding:8px 10px;
+            overscroll-behavior:contain;
         }
-        .pk-scroll {
-            height: 100%;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-            -webkit-overflow-scrolling: touch;
-            padding: 42px 0;
+        .res-scroll::-webkit-scrollbar{width:4px}
+        .res-scroll::-webkit-scrollbar-track{background:transparent}
+        .res-scroll::-webkit-scrollbar-thumb{background:rgba(91,110,245,.15);border-radius:2px}
+
+        .empty{
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            height:100%;color:var(--t3);font-size:.95rem;gap:10px;
         }
-        .pk-scroll::-webkit-scrollbar { display: none; }
-        .pk-item {
-            height: 36px;
-            display: flex; align-items: center; justify-content: center;
-            scroll-snap-align: center;
-            font-size: 0.78rem;
-            color: var(--text3);
-            transition: all 0.15s ease;
-            cursor: pointer;
-            padding: 0 4px;
+        .empty-icon{font-size:3rem;animation:bounce 2s ease-in-out infinite}
+        @keyframes bounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-8px) scale(1.06)}}
+
+        /* ===== SET CARD ===== */
+        .set{
+            padding:14px;margin-bottom:8px;
+            background:var(--surface);border-radius:16px;
+            border:1px solid var(--border);
+            animation:setIn .4s cubic-bezier(.34,1.56,.64,1) backwards;
+            box-shadow:0 2px 10px rgba(91,110,245,.06);
         }
-        .pk-item.active {
-            color: var(--primary);
-            font-weight: 800;
-            font-size: 0.86rem;
+        @keyframes setIn{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
+        .set-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .set-top strong{font-size:.95rem;color:var(--pri);font-weight:800}
+        .set-top .tag{
+            font-size:.72rem;color:var(--t3);
+            background:var(--card);padding:3px 10px;
+            border-radius:10px;border:1px solid var(--border);font-weight:600;
         }
 
-        /* Method desc */
-        .m-desc {
-            margin-top: 8px;
-            padding: 8px 12px;
-            background: var(--primary-pale);
-            border-radius: 10px;
-            border-left: 3px solid var(--primary);
-            font-size: 0.66rem;
-            color: var(--text2);
-            line-height: 1.5;
+        /* ===== BALLS ===== */
+        .balls{display:flex;justify-content:center;gap:clamp(8px,2.5vw,14px)}
+        .b{
+            width:clamp(44px,13vw,58px);height:clamp(44px,13vw,58px);
+            border-radius:50%;display:inline-flex;
+            align-items:center;justify-content:center;
+            font-weight:900;font-size:clamp(1rem,3.5vw,1.25rem);
+            color:#fff;position:relative;
+            text-shadow:0 1px 2px rgba(0,0,0,.2);
+            animation:bPop .5s cubic-bezier(.34,1.56,.64,1) backwards;
+            transition:transform .15s ease;
         }
+        .b:active{transform:scale(1.18) rotate(-5deg)}
+        .b::after{
+            content:'';position:absolute;top:14%;left:20%;
+            width:24%;height:18%;background:rgba(255,255,255,.5);
+            border-radius:50%;transform:rotate(-30deg);
+        }
+        @keyframes bPop{
+            0%{opacity:0;transform:scale(0) rotate(-40deg)}
+            50%{opacity:1;transform:scale(1.2) rotate(8deg)}
+            70%{transform:scale(.9) rotate(-3deg)}
+            100%{transform:scale(1) rotate(0)}
+        }
+        .b[data-range="1"]{background:linear-gradient(145deg,#ffd43b,#ff9f43);box-shadow:0 5px 20px rgba(255,159,67,.4),inset 0 2px 4px rgba(255,255,255,.3)}
+        .b[data-range="2"]{background:linear-gradient(145deg,#74b9ff,#3b82f6);box-shadow:0 5px 20px rgba(59,130,246,.4),inset 0 2px 4px rgba(255,255,255,.3)}
+        .b[data-range="3"]{background:linear-gradient(145deg,#ff7eb3,#ff3d71);box-shadow:0 5px 20px rgba(255,61,113,.35),inset 0 2px 4px rgba(255,255,255,.3)}
+        .b[data-range="4"]{background:linear-gradient(145deg,#b18cff,#8b5cf6);box-shadow:0 5px 20px rgba(139,92,246,.4),inset 0 2px 4px rgba(255,255,255,.3)}
+        .b[data-range="5"]{background:linear-gradient(145deg,#6ee7b7,#10b981);box-shadow:0 5px 20px rgba(16,185,129,.4),inset 0 2px 4px rgba(255,255,255,.3)}
 
-        /* === GENERATE BUTTON === */
-        .gen {
-            flex-shrink: 0;
-            display: block; width: 100%;
-            padding: 15px;
-            margin-bottom: 8px;
-            border: none;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent-cyan));
-            background-size: 200% 200%;
-            color: #fff;
-            font-family: 'Black Han Sans', sans-serif;
-            font-size: clamp(1.05rem, 4vw, 1.3rem);
-            letter-spacing: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative; overflow: hidden;
-            box-shadow: 0 6px 24px rgba(91,110,245,0.35);
-            animation: genPulse 3s ease-in-out infinite;
-        }
-        @keyframes genPulse {
-            0%, 100% { background-position: 0% 50%; box-shadow: 0 6px 24px rgba(91,110,245,0.35); }
-            50% { background-position: 100% 50%; box-shadow: 0 6px 30px rgba(56,201,255,0.35); }
-        }
-        .gen::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s ease;
-        }
-        .gen:active {
-            transform: scale(0.96);
-            box-shadow: 0 3px 12px rgba(91,110,245,0.3);
-        }
-        .gen.done {
-            background: linear-gradient(135deg, var(--accent-green), #1ad4a0) !important;
-            box-shadow: 0 6px 24px rgba(45,212,168,0.4) !important;
-            animation: none;
-        }
-        .gen.shimmer::before { left: 100%; }
+        /* ===== SPONSOR ===== */
+        .spon{flex-shrink:0;padding:6px 8px;text-align:center}
+        .spon-t{font-size:.72rem;color:var(--t3);font-weight:700}
+        .spon-d{font-size:.65rem;color:var(--t3);opacity:.7;margin-top:1px}
 
-        /* === RESULTS === */
-        .res {
-            flex: 1; min-height: 0;
-            background: var(--card);
-            border-radius: 18px;
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-            display: flex; flex-direction: column;
-            overflow: hidden;
-            margin-bottom: 6px;
+        /* ===== RESPONSIVE ===== */
+        @media (min-width:500px){
+            .app{padding:0 10px}
+            .b{width:56px;height:56px;font-size:1.2rem}
         }
-        .res-top {
-            padding: 9px 14px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            background: var(--surface);
+        @media (max-width:360px){
+            .hdr h1{font-size:1.6rem}
+            .cat{padding:7px 12px;font-size:.8rem}
+            .pk-box{height:115px}
+            .pk-scroll{padding:36px 0}
+            .pk-item{height:40px;font-size:.85rem}
+            .pk-item.active{font-size:.95rem}
+            .pk-hl{height:40px}
+            .b{width:40px;height:40px;font-size:.92rem}
+            .balls{gap:6px}
+            .set{padding:10px}
+            .m-desc{font-size:.76rem;padding:8px 10px}
         }
-        .res-top span {
-            font-size: 0.65rem;
-            color: var(--text3);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            font-weight: 600;
+        @media (max-height:600px) and (orientation:landscape){
+            .hdr{padding:4px 0 2px}
+            .hdr h1{font-size:1.3rem}
+            .hdr .sub{display:none}
+            .ctrl{padding:8px;margin-bottom:4px}
+            .pk-box{height:90px}
+            .pk-scroll{padding:24px 0}
+            .pk-item{height:36px}
+            .pk-hl{height:36px}
+            .gen{padding:12px;margin-bottom:4px}
+            .cats{margin-bottom:4px}
         }
-        .clr-btn {
-            background: var(--card);
-            border: 1px solid var(--border);
-            color: var(--text3);
-            font-size: 0.6rem;
-            padding: 4px 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 500;
-            transition: all 0.2s;
-            box-shadow: var(--shadow-sm);
-        }
-        .clr-btn:active { background: #fee; color: var(--accent-pink); border-color: var(--accent-pink); }
-        .res-scroll {
-            flex: 1;
-            overflow-y: auto;
-            padding: 8px;
-            overscroll-behavior: contain;
-        }
-        .res-scroll::-webkit-scrollbar { width: 3px; }
-        .res-scroll::-webkit-scrollbar-track { background: transparent; }
-        .res-scroll::-webkit-scrollbar-thumb { background: rgba(91,110,245,0.15); border-radius: 2px; }
-
-        .empty {
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            height: 100%;
-            color: var(--text3);
-            font-size: 0.78rem; gap: 8px;
-        }
-        .empty-icon {
-            font-size: 2.6rem;
-            animation: emptyBounce 2s ease-in-out infinite;
-        }
-        @keyframes emptyBounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-8px) scale(1.05); }
-        }
-
-        /* === SET CARD === */
-        .set {
-            padding: 12px 14px;
-            margin-bottom: 6px;
-            background: var(--surface);
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            animation: setIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-            box-shadow: var(--shadow-sm);
-        }
-        @keyframes setIn {
-            from { opacity: 0; transform: translateY(16px) scale(0.94); }
-            to { opacity: 1; transform: none; }
-        }
-        .set-top {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
-        }
-        .set-top strong {
-            font-size: 0.78rem;
-            color: var(--primary);
-            font-weight: 800;
-        }
-        .set-top .tag {
-            font-size: 0.55rem;
-            color: var(--text3);
-            background: var(--card);
-            padding: 2px 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            font-weight: 500;
-        }
-
-        /* === BALLS === */
-        .balls {
-            display: flex;
-            justify-content: center;
-            gap: clamp(6px, 2.2vw, 12px);
-        }
-        .b {
-            width: clamp(42px, 12vw, 56px);
-            height: clamp(42px, 12vw, 56px);
-            border-radius: 50%;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-weight: 900;
-            font-size: clamp(0.9rem, 3.2vw, 1.15rem);
-            color: #fff;
-            position: relative;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-            animation: bPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-            transition: transform 0.15s ease;
-        }
-        .b:active { transform: scale(1.18) rotate(-5deg); }
-        .b::after {
-            content: '';
-            position: absolute;
-            top: 14%; left: 20%;
-            width: 24%; height: 18%;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            transform: rotate(-30deg);
-        }
-        @keyframes bPop {
-            0% { opacity: 0; transform: scale(0) rotate(-40deg); }
-            50% { opacity: 1; transform: scale(1.2) rotate(8deg); }
-            70% { transform: scale(0.9) rotate(-3deg); }
-            100% { transform: scale(1) rotate(0); }
-        }
-
-        /* Ball colors - vivid & bright */
-        .b[data-range="1"] {
-            background: linear-gradient(145deg, #ffd43b, #ff9f43);
-            box-shadow: 0 5px 20px rgba(255,159,67,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
-        }
-        .b[data-range="2"] {
-            background: linear-gradient(145deg, #74b9ff, #3b82f6);
-            box-shadow: 0 5px 20px rgba(59,130,246,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
-        }
-        .b[data-range="3"] {
-            background: linear-gradient(145deg, #ff7eb3, #ff3d71);
-            box-shadow: 0 5px 20px rgba(255,61,113,0.35), inset 0 2px 4px rgba(255,255,255,0.3);
-        }
-        .b[data-range="4"] {
-            background: linear-gradient(145deg, #b18cff, #8b5cf6);
-            box-shadow: 0 5px 20px rgba(139,92,246,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
-        }
-        .b[data-range="5"] {
-            background: linear-gradient(145deg, #6ee7b7, #10b981);
-            box-shadow: 0 5px 20px rgba(16,185,129,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
-        }
-
-        /* === SPONSOR === */
-        .spon {
-            flex-shrink: 0;
-            padding: 8px; text-align: center;
-            margin-bottom: 4px;
-        }
-        .spon-t {
-            font-size: 0.6rem;
-            color: var(--text3);
-            font-weight: 700;
-        }
-        .spon-d {
-            font-size: 0.55rem;
-            color: var(--text3);
-            opacity: 0.7;
-            margin-top: 1px;
-        }
-
-        /* === RESPONSIVE === */
-        @media (min-width: 500px) {
-            .app { padding: 0 16px; }
-            .b { width: 54px; height: 54px; font-size: 1.1rem; }
-        }
-        @media (max-width: 360px) {
-            .pk-box { height: 105px; }
-            .pk-scroll { padding: 34px 0; }
-            .pk-item { height: 34px; font-size: 0.72rem; }
-            .pk-item.active { font-size: 0.78rem; }
-            .pk-hl { height: 34px; }
-            .cat { padding: 5px 10px; font-size: 0.65rem; }
-            .b { width: 38px; height: 38px; font-size: 0.82rem; }
-        }
-        @media (max-height: 500px) and (orientation: landscape) {
-            .hdr { padding: 6px 0 3px; }
-            .hdr h1 { font-size: 1.2rem; }
-            .hdr .sub { display: none; }
-            .ctrl { padding: 6px; margin-bottom: 4px; }
-            .pk-box { height: 90px; }
-            .pk-scroll { padding: 27px 0; }
-            .gen { padding: 10px; margin-bottom: 4px; }
-            .cats { margin-bottom: 4px; }
-        }
-
-        * { scrollbar-width: thin; scrollbar-color: rgba(91,110,245,0.12) transparent; }
+        *{scrollbar-width:thin;scrollbar-color:rgba(91,110,245,.12) transparent}
     </style>
 </head>
 <body>
-
 <canvas id="confetti"></canvas>
-
 <div class="app">
     <header class="hdr">
         <h1>LOTTO ORACLE</h1>
         <div class="sub">통계 기반 번호 생성기</div>
     </header>
 
-    <div class="cats" id="cats">
+    <div class="cats">
         <button class="cat active" data-cat="basic">기본</button>
         <button class="cat" data-cat="frequency">빈도/간격</button>
         <button class="cat" data-cat="pattern">패턴</button>
@@ -535,262 +342,109 @@
 </div>
 
 <script>
-// =============== CONFETTI ENGINE ===============
-const Confetti = (() => {
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    let particles = [];
-    let raf = null;
-    const colors = ['#5b6ef5','#ff6b9d','#ff9a56','#2dd4a8','#38c9ff','#ffd43b','#b18cff'];
+// ===== CONFETTI =====
+const Confetti=(()=>{const cv=document.getElementById('confetti'),cx=cv.getContext('2d');let ps=[],raf=null;const cs=['#5b6ef5','#ff6b9d','#ff9a56','#2dd4a8','#38c9ff','#ffd43b','#b18cff'];function rz(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',rz);rz();function mk(n=60){for(let i=0;i<n;i++)ps.push({x:Math.random()*cv.width,y:-10-Math.random()*40,w:4+Math.random()*6,h:3+Math.random()*4,c:cs[Math.random()*cs.length|0],vy:2+Math.random()*3,vx:(Math.random()-.5)*3,rot:Math.random()*360,rv:(Math.random()-.5)*8,life:1});if(!raf)ani()}function ani(){cx.clearRect(0,0,cv.width,cv.height);ps=ps.filter(p=>p.life>0);if(!ps.length){raf=null;return}ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.rot+=p.rv;p.life-=.006;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot*Math.PI/180);cx.globalAlpha=Math.min(1,p.life*2);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});raf=requestAnimationFrame(ani)}return{fire:mk}})();
 
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+// ===== HAPTIC & SOUND =====
+const Haptic={light(){try{navigator.vibrate?.(8)}catch(e){}},medium(){try{navigator.vibrate?.(15)}catch(e){}},heavy(){try{navigator.vibrate?.(30)}catch(e){}},tick(){try{navigator.vibrate?.(4)}catch(e){}},success(){try{navigator.vibrate?.([12,40,12])}catch(e){}}};
+const Sound=(()=>{let ctx=null;function gc(){if(!ctx){try{ctx=new(AudioContext||webkitAudioContext)}catch(e){return null}}if(ctx.state==='suspended')ctx.resume();return ctx}function p(f,t,d,v=.12){const c=gc();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+d);o.connect(g);g.connect(c.destination);o.start(c.currentTime);o.stop(c.currentTime+d)}return{tick(){p(2200,'sine',.03,.05)},click(){p(1400,'sine',.05,.07)},select(){p(880,'sine',.07,.09);setTimeout(()=>p(1175,'sine',.07,.07),50)},generate(){p(523,'sine',.1,.1);setTimeout(()=>p(659,'sine',.1,.09),70);setTimeout(()=>p(784,'sine',.12,.1),140);setTimeout(()=>p(1047,'sine',.2,.12),220)},ballPop(i){setTimeout(()=>p(700+i*130,'sine',.06,.06),i*55)},clear(){p(500,'triangle',.12,.06)},success(){p(784,'sine',.12,.1);setTimeout(()=>p(988,'sine',.12,.1),90);setTimeout(()=>p(1319,'sine',.25,.12),180)}}})();
 
-    function create(count = 60) {
-        for (let i = 0; i < count; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: -10 - Math.random() * 40,
-                w: 4 + Math.random() * 6,
-                h: 3 + Math.random() * 4,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                vy: 2 + Math.random() * 3,
-                vx: (Math.random() - 0.5) * 3,
-                rot: Math.random() * 360,
-                rv: (Math.random() - 0.5) * 8,
-                life: 1
-            });
-        }
-        if (!raf) animate();
-    }
+// ===== HISTORICAL DATA =====
+const HISTORY=[[3,12,18,24,30,43],[2,7,12,22,26,37],[7,11,20,30,39,43],[2,3,14,28,37,45],[6,7,14,18,29,44],[2,6,10,23,25,45],[3,9,17,19,43,44],[7,10,14,18,37,43],[1,4,7,15,38,45],[2,8,25,27,37,39],[13,19,22,28,34,44],[7,8,20,28,33,45],[2,15,19,24,34,43],[4,9,11,20,28,34],[6,14,17,27,30,42],[7,10,16,18,28,45],[6,14,16,21,22,43],[5,10,11,17,28,34],[9,12,20,23,34,40],[6,7,22,32,37,40],[3,5,21,24,26,42],[16,19,21,25,26,44],[6,8,14,22,30,44],[4,12,14,28,32,33],[7,11,24,28,35,45],[2,9,16,36,38,42],[5,12,25,26,33,44],[8,15,17,19,43,44],[7,10,22,28,34,40],[1,5,22,25,27,32],[1,12,20,25,30,45],[3,7,15,29,40,44],[3,11,15,27,29,45],[6,17,19,21,36,43],[1,2,11,28,36,45],[6,14,25,27,37,45],[3,10,23,29,33,45],[3,5,17,23,24,35],[3,15,23,24,25,44],[9,12,13,19,37,45],[1,3,23,24,27,40],[4,11,16,30,33,44],[7,9,14,18,22,28],[4,12,17,28,38,45],[6,10,16,28,34,44],[7,15,16,21,29,44],[6,9,11,17,24,45],[1,7,10,22,26,43],[1,2,4,7,36,45],[5,6,11,19,28,43],[3,10,13,22,42,45],[8,10,18,20,24,43],[6,13,27,30,39,40],[6,12,19,22,31,45],[5,6,7,16,17,28],[5,9,13,23,39,45],[3,4,8,20,34,44],[4,9,28,32,38,42],[8,11,13,28,36,42],[2,3,22,27,28,41],[7,12,13,18,29,45],[4,14,16,21,35,44],[1,10,18,31,33,44],[3,13,16,18,32,45],[5,9,27,33,35,43],[3,10,11,15,20,30],[6,13,16,22,43,45],[3,10,11,16,36,44],[3,13,20,28,33,45],[1,3,8,15,34,44],[6,11,16,19,22,27],[4,7,12,14,22,38],[7,8,12,21,30,40],[12,21,24,30,37,43],[2,4,10,23,28,41],[3,5,6,10,22,26],[2,11,15,16,27,34],[4,16,17,21,29,44],[3,7,10,12,27,41],[4,6,7,37,38,43],[5,8,18,21,24,36],[3,5,15,16,33,45],[4,5,17,18,31,43],[2,8,10,25,29,45],[6,11,32,34,40,45],[3,7,17,21,22,44],[2,5,7,10,13,44],[4,7,17,18,38,43],[2,14,20,27,39,42],[1,5,20,25,28,45],[1,3,7,28,35,42],[5,11,20,33,39,43],[4,8,13,22,28,44],[9,12,14,26,36,45],[7,11,13,15,22,44],[3,6,7,14,27,35],[2,6,12,19,22,43],[4,7,9,14,21,44],[3,12,15,24,30,44],[6,8,23,27,38,43],[2,5,10,17,24,30],[7,11,22,33,39,45]];
 
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles = particles.filter(p => p.life > 0);
-        if (particles.length === 0) { raf = null; return; }
-
-        particles.forEach(p => {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vy += 0.04;
-            p.rot += p.rv;
-            p.life -= 0.006;
-
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            ctx.rotate(p.rot * Math.PI / 180);
-            ctx.globalAlpha = Math.min(1, p.life * 2);
-            ctx.fillStyle = p.color;
-            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-            ctx.restore();
-        });
-        raf = requestAnimationFrame(animate);
-    }
-
-    return { fire: create };
-})();
-
-// =============== HAPTIC & SOUND ===============
-const Haptic = {
-    light()  { try { navigator.vibrate?.(8); } catch(e){} },
-    medium() { try { navigator.vibrate?.(15); } catch(e){} },
-    heavy()  { try { navigator.vibrate?.(30); } catch(e){} },
-    tick()   { try { navigator.vibrate?.(4); } catch(e){} },
-    success(){ try { navigator.vibrate?.([12, 40, 12]); } catch(e){} }
+// ===== STATISTICS =====
+const Stats={
+    getFrequencies(){const f=new Array(46).fill(0);HISTORY.forEach(d=>d.forEach(n=>f[n]++));return f},
+    getGaps(){const g=new Array(46).fill(HISTORY.length);for(let i=0;i<HISTORY.length;i++)HISTORY[i].forEach(n=>{if(g[n]===HISTORY.length)g[n]=i});return g},
+    getPairFreq(){const p={};HISTORY.forEach(d=>{for(let i=0;i<d.length;i++)for(let j=i+1;j<d.length;j++){const k=d[i]+','+d[j];p[k]=(p[k]||0)+1}});return p},
+    getMovingAvg(w=15){const s=new Array(46).fill(0);HISTORY.slice(0,w).forEach((d,i)=>{const wt=(w-i)/w;d.forEach(n=>s[n]+=wt)});return s},
+    calcAC(n){const d=new Set();for(let i=0;i<n.length;i++)for(let j=i+1;j<n.length;j++)d.add(Math.abs(n[i]-n[j]));return d.size-(n.length-1)},
+    entropyScore(n){const s=[...n].sort((a,b)=>a-b);let sc=0;const r=[0,0,0,0,0];s.forEach(v=>{if(v<=10)r[0]++;else if(v<=20)r[1]++;else if(v<=30)r[2]++;else if(v<=40)r[3]++;else r[4]++});sc+=r.filter(x=>x>0).length*2;const od=s.filter(v=>v%2===1).length;sc+=(3-Math.abs(3-od))*1.5;for(let i=1;i<s.length;i++)sc+=Math.min(s[i]-s[i-1],10)*.3;return sc},
+    isValidPattern(n){const s=[...n].sort((a,b)=>a-b);const od=s.filter(v=>v%2===1).length;if(od===0||od===6)return false;if(new Set(s.map(v=>Math.floor((v-1)/10))).size===1)return false;let c=1;for(let i=1;i<s.length;i++){if(s[i]===s[i-1]+1){c++;if(c>=4)return false}else c=1}const sm=s.reduce((a,b)=>a+b,0);return sm>=60&&sm<=220},
+    weightedPick(w,cnt){const res=new Set(),av=[];for(let i=1;i<=45;i++)if(w[i]>0)av.push({n:i,w:w[i]});while(res.size<cnt&&av.length>0){const tot=av.reduce((s,a)=>s+a.w,0);let r=Math.random()*tot;for(let k=0;k<av.length;k++){r-=av[k].w;if(r<=0){res.add(av[k].n);av.splice(k,1);break}}}while(res.size<cnt){const n=Math.floor(Math.random()*45)+1;if(!res.has(n))res.add(n)}return[...res]}
 };
 
-const Sound = (() => {
-    let ctx = null;
-    function getCtx() {
-        if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
-        if (ctx.state === 'suspended') ctx.resume();
-        return ctx;
-    }
-    function play(freq, type, dur, vol = 0.12) {
-        const c = getCtx(); if (!c) return;
-        const osc = c.createOscillator(), gain = c.createGain();
-        osc.type = type; osc.frequency.value = freq;
-        gain.gain.setValueAtTime(vol, c.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
-        osc.connect(gain); gain.connect(c.destination);
-        osc.start(c.currentTime); osc.stop(c.currentTime + dur);
-    }
-    return {
-        tick() { play(2200, 'sine', 0.03, 0.05); },
-        click() { play(1400, 'sine', 0.05, 0.07); },
-        select() { play(880, 'sine', 0.07, 0.09); setTimeout(() => play(1175, 'sine', 0.07, 0.07), 50); },
-        generate() {
-            play(523, 'sine', 0.1, 0.1);
-            setTimeout(() => play(659, 'sine', 0.1, 0.09), 70);
-            setTimeout(() => play(784, 'sine', 0.12, 0.1), 140);
-            setTimeout(() => play(1047, 'sine', 0.2, 0.12), 220);
-        },
-        ballPop(i) { setTimeout(() => play(700 + i * 130, 'sine', 0.06, 0.06), i * 55); },
-        clear() { play(500, 'triangle', 0.12, 0.06); },
-        success() { play(784, 'sine', 0.12, 0.1); setTimeout(() => play(988, 'sine', 0.12, 0.1), 90); setTimeout(() => play(1319, 'sine', 0.25, 0.12), 180); }
-    };
-})();
-
-// =============== HISTORICAL DATA ===============
-const HISTORY = [
-    [3,12,18,24,30,43],[2,7,12,22,26,37],[7,11,20,30,39,43],[2,3,14,28,37,45],[6,7,14,18,29,44],
-    [2,6,10,23,25,45],[3,9,17,19,43,44],[7,10,14,18,37,43],[1,4,7,15,38,45],[2,8,25,27,37,39],
-    [13,19,22,28,34,44],[7,8,20,28,33,45],[2,15,19,24,34,43],[4,9,11,20,28,34],[6,14,17,27,30,42],
-    [7,10,16,18,28,45],[6,14,16,21,22,43],[5,10,11,17,28,34],[9,12,20,23,34,40],[6,7,22,32,37,40],
-    [3,5,21,24,26,42],[16,19,21,25,26,44],[6,8,14,22,30,44],[4,12,14,28,32,33],[7,11,24,28,35,45],
-    [2,9,16,36,38,42],[5,12,25,26,33,44],[8,15,17,19,43,44],[7,10,22,28,34,40],[1,5,22,25,27,32],
-    [1,12,20,25,30,45],[3,7,15,29,40,44],[3,11,15,27,29,45],[6,17,19,21,36,43],[1,2,11,28,36,45],
-    [6,14,25,27,37,45],[3,10,23,29,33,45],[3,5,17,23,24,35],[3,15,23,24,25,44],[9,12,13,19,37,45],
-    [1,3,23,24,27,40],[4,11,16,30,33,44],[7,9,14,18,22,28],[4,12,17,28,38,45],[6,10,16,28,34,44],
-    [7,15,16,21,29,44],[6,9,11,17,24,45],[1,7,10,22,26,43],[1,2,4,7,36,45],[5,6,11,19,28,43],
-    [3,10,13,22,42,45],[8,10,18,20,24,43],[6,13,27,30,39,40],[6,12,19,22,31,45],[5,6,7,16,17,28],
-    [5,9,13,23,39,45],[3,4,8,20,34,44],[4,9,28,32,38,42],[8,11,13,28,36,42],[2,3,22,27,28,41],
-    [7,12,13,18,29,45],[4,14,16,21,35,44],[1,10,18,31,33,44],[3,13,16,18,32,45],[5,9,27,33,35,43],
-    [3,10,11,15,20,30],[6,13,16,22,43,45],[3,10,11,16,36,44],[3,13,20,28,33,45],[1,3,8,15,34,44],
-    [6,11,16,19,22,27],[4,7,12,14,22,38],[7,8,12,21,30,40],[12,21,24,30,37,43],[2,4,10,23,28,41],
-    [3,5,6,10,22,26],[2,11,15,16,27,34],[4,16,17,21,29,44],[3,7,10,12,27,41],[4,6,7,37,38,43],
-    [5,8,18,21,24,36],[3,5,15,16,33,45],[4,5,17,18,31,43],[2,8,10,25,29,45],[6,11,32,34,40,45],
-    [3,7,17,21,22,44],[2,5,7,10,13,44],[4,7,17,18,38,43],[2,14,20,27,39,42],[1,5,20,25,28,45],
-    [1,3,7,28,35,42],[5,11,20,33,39,43],[4,8,13,22,28,44],[9,12,14,26,36,45],[7,11,13,15,22,44],
-    [3,6,7,14,27,35],[2,6,12,19,22,43],[4,7,9,14,21,44],[3,12,15,24,30,44],[6,8,23,27,38,43],
-    [2,5,10,17,24,30],[7,11,22,33,39,45]
-];
-
-// =============== STATISTICS ===============
-const Stats = {
-    getFrequencies() { const f=new Array(46).fill(0); HISTORY.forEach(d=>d.forEach(n=>f[n]++)); return f; },
-    getGaps() { const g=new Array(46).fill(HISTORY.length); for(let i=0;i<HISTORY.length;i++) HISTORY[i].forEach(n=>{if(g[n]===HISTORY.length)g[n]=i;}); return g; },
-    getPairFreq() { const p={}; HISTORY.forEach(d=>{for(let i=0;i<d.length;i++)for(let j=i+1;j<d.length;j++){const k=d[i]+','+d[j];p[k]=(p[k]||0)+1;}}); return p; },
-    getMovingAvg(w=15) { const s=new Array(46).fill(0); HISTORY.slice(0,w).forEach((d,i)=>{const wt=(w-i)/w;d.forEach(n=>s[n]+=wt);}); return s; },
-    calcAC(nums) { const d=new Set(); for(let i=0;i<nums.length;i++) for(let j=i+1;j<nums.length;j++) d.add(Math.abs(nums[i]-nums[j])); return d.size-(nums.length-1); },
-    entropyScore(nums) { const s=[...nums].sort((a,b)=>a-b); let sc=0; const r=[0,0,0,0,0]; s.forEach(n=>{if(n<=10)r[0]++;else if(n<=20)r[1]++;else if(n<=30)r[2]++;else if(n<=40)r[3]++;else r[4]++;}); sc+=r.filter(x=>x>0).length*2; const od=s.filter(n=>n%2===1).length; sc+=(3-Math.abs(3-od))*1.5; for(let i=1;i<s.length;i++) sc+=Math.min(s[i]-s[i-1],10)*0.3; return sc; },
-    isValidPattern(nums) { const s=[...nums].sort((a,b)=>a-b); const od=s.filter(n=>n%2===1).length; if(od===0||od===6)return false; if(new Set(s.map(n=>Math.floor((n-1)/10))).size===1)return false; let c=1; for(let i=1;i<s.length;i++){if(s[i]===s[i-1]+1){c++;if(c>=4)return false;}else c=1;} const sm=s.reduce((a,b)=>a+b,0); return sm>=60&&sm<=220; },
-    weightedPick(weights, count) { const res=new Set(),av=[]; for(let i=1;i<=45;i++) if(weights[i]>0) av.push({num:i,weight:weights[i]}); while(res.size<count&&av.length>0){const tot=av.reduce((s,a)=>s+a.weight,0);let r=Math.random()*tot;for(let k=0;k<av.length;k++){r-=av[k].weight;if(r<=0){res.add(av[k].num);av.splice(k,1);break;}}} while(res.size<count){const n=Math.floor(Math.random()*45)+1;if(!res.has(n))res.add(n);} return[...res]; }
+// ===== GENERATORS =====
+const G={
+    '90':{name:'90번 방법',desc:'2~90 난수를 2로 나눈 뒤 올림하여 번호를 생성합니다.',fn(){const s=new Set();while(s.size<6)s.add(Math.ceil((Math.floor(Math.random()*89)+2)/2));return[...s]}},
+    random:{name:'랜덤',desc:'1~45에서 완전 무작위로 6개를 선택합니다.',fn(){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);return[...s]}},
+    oddeven:{name:'홀짝 균형',desc:'홀수 3개 + 짝수 3개. 역대 가장 빈출하는 비율입니다.',fn(){const o=new Set(),e=new Set();while(o.size<3){const n=Math.floor(Math.random()*23)*2+1;if(n<=45)o.add(n)}while(e.size<3)e.add(Math.floor(Math.random()*22)*2+2);return[...o,...e]}},
+    highlow:{name:'고저 균형',desc:'저번호(1~22) 3개 + 고번호(23~45) 3개를 선택합니다.',fn(){const l=new Set(),h=new Set();while(l.size<3)l.add(Math.floor(Math.random()*22)+1);while(h.size<3)h.add(Math.floor(Math.random()*23)+23);return[...l,...h]}},
+    section:{name:'번호대 분산',desc:'5개 구간에서 1개씩 + 랜덤 1개를 뽑습니다.',fn(){const sec=[[1,9],[10,19],[20,29],[30,39],[40,45]],u=new Set(),n=[];sec.forEach(([a,b])=>{let v;do{v=Math.floor(Math.random()*(b-a+1))+a}while(u.has(v));u.add(v);n.push(v)});let x;do{x=Math.floor(Math.random()*45)+1}while(u.has(x));n.push(x);return n}},
+    frequency:{name:'빈도 분석',desc:'역대 당첨에서 자주 출현한 핫 넘버에 가중치를 둡니다.',fn(){return Stats.weightedPick(Stats.getFrequencies(),6)}},
+    gap:{name:'간격 분석',desc:'오랫동안 출현하지 않은 콜드 넘버를 우선 선택합니다.',fn(){const g=Stats.getGaps(),w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=g[i]+1;return Stats.weightedPick(w,6)}},
+    association:{name:'연관 규칙',desc:'자주 함께 출현하는 번호 쌍 기반으로 조합을 구성합니다.',fn(){const p=Stats.getPairFreq(),s=Object.entries(p).sort((a,b)=>b[1]-a[1]),r=new Set();for(const[k]of s){if(r.size>=6)break;const[a,b]=k.split(',').map(Number);if(r.size<5){r.add(a);r.add(b)}else if(!r.has(a))r.add(a);else if(!r.has(b))r.add(b)}while(r.size<6)r.add(Math.floor(Math.random()*45)+1);return[...r].slice(0,6)}},
+    poisson:{name:'확률 분포',desc:'포아송 분포 기반으로 과소 출현 번호를 우선 선택합니다.',fn(){const f=Stats.getFrequencies(),ex=HISTORY.length*6/45,w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=Math.max(.1,ex-f[i]+ex);return Stats.weightedPick(w,6)}},
+    movingavg:{name:'이동평균',desc:'최근 15회차 가중 이동평균으로 상승 추세 번호를 선택합니다.',fn(){const r=Stats.getMovingAvg(15),o=Stats.getMovingAvg(30),t=new Array(46).fill(0);for(let i=1;i<=45;i++)t[i]=Math.max(.1,r[i]*2-o[i]+1);return Stats.weightedPick(t,6)}},
+    sumrange:{name:'합계 범위',desc:'합계가 최빈 구간(100~175)에 해당하는 조합만 선택합니다.',fn(){for(let a=0;a<5000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s];if(arr.reduce((a,b)=>a+b,0)>=100&&arr.reduce((a,b)=>a+b,0)<=175)return arr}return G.random.fn()}},
+    montecarlo:{name:'몬테카를로',desc:'10,000회 시뮬레이션으로 역대 분포와 가장 유사한 조합 선택.',fn(){const f=Stats.getFrequencies(),tot=HISTORY.length*6,id=f.map(v=>v/tot);let best=null,bs=Infinity;for(let t=0;t<10000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s];let sc=0;a.forEach(n=>sc+=Math.abs(id[n]-1/45));const sm=a.reduce((x,y)=>x+y,0);if(sm<100||sm>175)sc+=.5;const ac=Stats.calcAC(a);if(ac<7||ac>10)sc+=.3;if(sc<bs){bs=sc;best=a}}return best||G.random.fn()}},
+    entropy:{name:'엔트로피 기반',desc:'정보 엔트로피(다양성)를 최대화하는 분산 전략입니다.',fn(){let best=null,bs=-Infinity;for(let t=0;t<5000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s],sc=Stats.entropyScore(a);if(sc>bs){bs=sc;best=a}}return best||G.random.fn()}},
+    elimination:{name:'배제 전략',desc:'올홀, 올짝, 연속4+, 극단합 등 비현실 패턴을 배제합니다.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);if(Stats.isValidPattern([...s]))return[...s]}return G.random.fn()}},
+    acvalue:{name:'AC값 최적화',desc:'AC값 7~10 범위 조합만 선택. 역대 당첨의 80%가 이 범위.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s].sort((a,b)=>a-b);if(Stats.calcAC(arr)>=7&&Stats.calcAC(arr)<=10&&Stats.isValidPattern(arr))return arr}return G.random.fn()}}
 };
 
-// =============== GENERATORS ===============
-const G = {
-    '90':{name:'90번 방법',desc:'2~90 난수를 2로 나눈 뒤 올림하여 번호를 생성합니다.',fn(){const s=new Set();while(s.size<6){s.add(Math.ceil((Math.floor(Math.random()*89)+2)/2));}return[...s];}},
-    random:{name:'랜덤',desc:'1~45에서 완전 무작위로 6개를 선택합니다.',fn(){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);return[...s];}},
-    oddeven:{name:'홀짝 균형',desc:'홀수 3개 + 짝수 3개. 역대 가장 빈출하는 비율입니다.',fn(){const o=new Set(),e=new Set();while(o.size<3){const n=Math.floor(Math.random()*23)*2+1;if(n<=45)o.add(n);}while(e.size<3)e.add(Math.floor(Math.random()*22)*2+2);return[...o,...e];}},
-    highlow:{name:'고저 균형',desc:'저번호(1~22) 3개 + 고번호(23~45) 3개를 선택합니다.',fn(){const l=new Set(),h=new Set();while(l.size<3)l.add(Math.floor(Math.random()*22)+1);while(h.size<3)h.add(Math.floor(Math.random()*23)+23);return[...l,...h];}},
-    section:{name:'번호대 분산',desc:'각 구간(1~9,10~19,20~29,30~39,40~45)에서 1개씩 + 랜덤 1개.',fn(){const sec=[[1,9],[10,19],[20,29],[30,39],[40,45]],u=new Set(),n=[];sec.forEach(([a,b])=>{let v;do{v=Math.floor(Math.random()*(b-a+1))+a;}while(u.has(v));u.add(v);n.push(v);});let x;do{x=Math.floor(Math.random()*45)+1;}while(u.has(x));n.push(x);return n;}},
-    frequency:{name:'빈도 분석',desc:'역대 당첨에서 자주 출현한 핫 넘버에 가중치를 둡니다.',fn(){return Stats.weightedPick(Stats.getFrequencies(),6);}},
-    gap:{name:'간격 분석',desc:'오랫동안 출현하지 않은 콜드 넘버를 우선 선택합니다.',fn(){const g=Stats.getGaps(),w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=g[i]+1;return Stats.weightedPick(w,6);}},
-    association:{name:'연관 규칙',desc:'자주 함께 출현하는 번호 쌍을 기반으로 조합을 구성합니다.',fn(){const p=Stats.getPairFreq(),s=Object.entries(p).sort((a,b)=>b[1]-a[1]),r=new Set();for(const[k]of s){if(r.size>=6)break;const[a,b]=k.split(',').map(Number);if(r.size<5){r.add(a);r.add(b);}else if(!r.has(a))r.add(a);else if(!r.has(b))r.add(b);}while(r.size<6)r.add(Math.floor(Math.random()*45)+1);return[...r].slice(0,6);}},
-    poisson:{name:'확률 분포',desc:'포아송 분포 기반으로 과소 출현 번호를 우선 선택합니다.',fn(){const f=Stats.getFrequencies(),ex=HISTORY.length*6/45,w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=Math.max(0.1,ex-f[i]+ex);return Stats.weightedPick(w,6);}},
-    movingavg:{name:'이동평균',desc:'최근 15회차 가중 이동평균으로 상승 추세 번호를 선택합니다.',fn(){const r=Stats.getMovingAvg(15),o=Stats.getMovingAvg(30),t=new Array(46).fill(0);for(let i=1;i<=45;i++)t[i]=Math.max(0.1,r[i]*2-o[i]+1);return Stats.weightedPick(t,6);}},
-    sumrange:{name:'합계 범위',desc:'합계가 최빈 구간(100~175)에 해당하는 조합만 선택합니다.',fn(){for(let a=0;a<5000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s];if(arr.reduce((a,b)=>a+b,0)>=100&&arr.reduce((a,b)=>a+b,0)<=175)return arr;}return G.random.fn();}},
-    montecarlo:{name:'몬테카를로',desc:'10,000회 시뮬레이션으로 역대 분포와 가장 유사한 조합을 선택합니다.',fn(){const f=Stats.getFrequencies(),tot=HISTORY.length*6,id=f.map(v=>v/tot);let best=null,bs=Infinity;for(let t=0;t<10000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s];let sc=0;a.forEach(n=>sc+=Math.abs(id[n]-1/45));const sm=a.reduce((x,y)=>x+y,0);if(sm<100||sm>175)sc+=0.5;const ac=Stats.calcAC(a);if(ac<7||ac>10)sc+=0.3;if(sc<bs){bs=sc;best=a;}}return best||G.random.fn();}},
-    entropy:{name:'엔트로피 기반',desc:'정보 엔트로피(다양성)를 최대화하는 분산 전략입니다.',fn(){let best=null,bs=-Infinity;for(let t=0;t<5000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s],sc=Stats.entropyScore(a);if(sc>bs){bs=sc;best=a;}}return best||G.random.fn();}},
-    elimination:{name:'배제 전략',desc:'올홀, 올짝, 연속4+, 극단합 등 비현실 패턴을 배제합니다.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);if(Stats.isValidPattern([...s]))return[...s];}return G.random.fn();}},
-    acvalue:{name:'AC값 최적화',desc:'AC값 7~10 범위 조합만 선택. 역대 당첨의 80%가 이 범위입니다.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s].sort((a,b)=>a-b);if(Stats.calcAC(arr)>=7&&Stats.calcAC(arr)<=10&&Stats.isValidPattern(arr))return arr;}return G.random.fn();}}
-};
+// ===== CATEGORIES =====
+const CATS={basic:['90','random','oddeven','highlow','section'],frequency:['frequency','gap','movingavg'],pattern:['association','oddeven','section'],advanced:['poisson','montecarlo','entropy','acvalue'],filter:['sumrange','elimination','acvalue']};
+let curCat='basic',selMethod='90',selSets=5;
 
-// =============== CATEGORIES ===============
-const CATS = {
-    basic:['90','random','oddeven','highlow','section'],
-    frequency:['frequency','gap','movingavg'],
-    pattern:['association','oddeven','section'],
-    advanced:['poisson','montecarlo','entropy','acvalue'],
-    filter:['sumrange','elimination','acvalue']
-};
-
-let curCat='basic', selMethod='90', selSets=4;
-
-// =============== PICKER ===============
-function createPicker(id, opts, defIdx, onSelect) {
+// ===== PICKER =====
+function createPicker(id,opts,defIdx,onSelect){
     const el=document.getElementById(id);
-    const ih=36, cnt=opts.length, cl=Math.min(3,cnt);
-    let val=opts[defIdx].value, scrolling=false, lastVal=null;
+    const ih=42,cnt=opts.length,cl=Math.min(3,cnt);
+    let val=opts[defIdx].value,scrolling=false,lastVal=null;
     el.innerHTML='';
-    const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;d.style.height=ih+'px';return d;};
-    for(let i=cnt-cl;i<cnt;i++) el.appendChild(mk(opts[i],i,true));
+    const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;d.style.height=ih+'px';return d};
+    for(let i=cnt-cl;i<cnt;i++)el.appendChild(mk(opts[i],i,true));
     opts.forEach((o,i)=>el.appendChild(mk(o,i,false)));
-    for(let i=0;i<cl;i++) el.appendChild(mk(opts[i],i,true));
+    for(let i=0;i<cl;i++)el.appendChild(mk(opts[i],i,true));
     const items=el.querySelectorAll('.pk-item');
-    function updateActive(){const ci=Math.round(el.scrollTop/ih);items.forEach((it,idx)=>{if(idx===ci){it.classList.add('active');val=it.dataset.value;if(val!==lastVal){lastVal=val;Haptic.tick();Sound.tick();onSelect(val);}}else it.classList.remove('active');});}
-    function handleScroll(){if(scrolling)return;const st=el.scrollTop;if(st<(cl-1)*ih){scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50);}else if(st>(cl+cnt-1)*ih){scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50);}updateActive();}
-    el.addEventListener('scroll',handleScroll);
-    items.forEach(it=>{it.addEventListener('click',()=>{Haptic.light();Sound.click();el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'});});});
+    function upd(){const ci=Math.round(el.scrollTop/ih);items.forEach((it,idx)=>{if(idx===ci){it.classList.add('active');val=it.dataset.value;if(val!==lastVal){lastVal=val;Haptic.tick();Sound.tick();onSelect(val)}}else it.classList.remove('active')})}
+    function scr(){if(scrolling)return;const st=el.scrollTop;if(st<(cl-1)*ih){scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50)}else if(st>(cl+cnt-1)*ih){scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50)}upd()}
+    el.addEventListener('scroll',scr);
+    items.forEach(it=>{it.addEventListener('click',()=>{Haptic.light();Sound.click();el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'})})});
     el.style.padding=Math.floor((el.parentElement.clientHeight-ih)/2)+'px 0';
-    setTimeout(()=>{el.scrollTop=(cl+defIdx)*ih;updateActive();},60);
+    setTimeout(()=>{el.scrollTop=(cl+defIdx)*ih;upd()},60);
     return()=>val;
 }
 
-// =============== CATEGORY TABS ===============
-document.querySelectorAll('.cat').forEach(tab=>{
-    tab.addEventListener('click',()=>{
-        Haptic.medium(); Sound.select();
-        document.querySelectorAll('.cat').forEach(t=>t.classList.remove('active'));
-        tab.classList.add('active');
-        curCat=tab.dataset.cat;
-        rebuildMethod();
-    });
-});
-function rebuildMethod(){const keys=CATS[curCat],opts=keys.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc();});}
-function updateDesc(){const d=document.getElementById('mDesc');if(G[selMethod])d.textContent=G[selMethod].desc;}
+// ===== TABS =====
+document.querySelectorAll('.cat').forEach(tab=>{tab.addEventListener('click',()=>{Haptic.medium();Sound.select();document.querySelectorAll('.cat').forEach(t=>t.classList.remove('active'));tab.classList.add('active');curCat=tab.dataset.cat;rebuildMethod()})});
+function rebuildMethod(){const keys=CATS[curCat],opts=keys.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc()})}
+function updateDesc(){const d=document.getElementById('mDesc');if(G[selMethod])d.textContent=G[selMethod].desc}
 
-const setCounts=[];
-for(let i=1;i<=10;i++) setCounts.push({value:i,label:i+'세트'});
-createPicker('setCountPicker',setCounts,3,v=>selSets=parseInt(v));
+const setCounts=[];for(let i=1;i<=10;i++)setCounts.push({value:i,label:i+'세트'});
+createPicker('setCountPicker',setCounts,4,v=>selSets=parseInt(v));
 rebuildMethod();
 
-// =============== GENERATE ===============
+// ===== GENERATE =====
 const genBtn=document.getElementById('genBtn');
 genBtn.addEventListener('click',generate);
-
 function generate(){
-    const gen=G[selMethod]; if(!gen) return;
-    Sound.generate(); Haptic.heavy();
-
-    const emp=document.getElementById('emptyState'); if(emp) emp.remove();
-    const container=document.getElementById('resScroll');
-    const range=n=>n<=10?'1':n<=20?'2':n<=30?'3':n<=40?'4':'5';
-
+    const gen=G[selMethod];if(!gen)return;
+    Sound.generate();Haptic.heavy();
+    const emp=document.getElementById('emptyState');if(emp)emp.remove();
+    const ct=document.getElementById('resScroll');
+    const rng=n=>n<=10?'1':n<=20?'2':n<=30?'3':n<=40?'4':'5';
     for(let s=1;s<=selSets;s++){
         const nums=gen.fn().sort((a,b)=>a-b);
         const el=document.createElement('div');
-        el.className='set';
-        el.style.animationDelay=(s-1)*0.08+'s';
-        el.innerHTML=`
-            <div class="set-top">
-                <strong>${s}세트</strong>
-                <span class="tag">${gen.name}</span>
-            </div>
-            <div class="balls">
-                ${nums.map((n,i)=>`<span class="b" data-range="${range(n)}" style="animation-delay:${(s-1)*0.08+i*0.07}s">${n}</span>`).join('')}
-            </div>`;
-        container.insertBefore(el,container.firstChild);
+        el.className='set';el.style.animationDelay=(s-1)*.08+'s';
+        el.innerHTML=`<div class="set-top"><strong>${s}세트</strong><span class="tag">${gen.name}</span></div><div class="balls">${nums.map((n,i)=>`<span class="b" data-range="${rng(n)}" style="animation-delay:${(s-1)*.08+i*.07}s">${n}</span>`).join('')}</div>`;
+        ct.insertBefore(el,ct.firstChild);
         nums.forEach((_,i)=>Sound.ballPop(i+(s-1)*6));
     }
-    container.scrollTop=0;
-
-    // Confetti!
-    Confetti.fire(50 + selSets * 10);
-
-    genBtn.textContent='생성 완료!';
-    genBtn.classList.add('done','shimmer');
-    setTimeout(()=>Sound.success(),300);
-    setTimeout(()=>Haptic.success(),300);
-    setTimeout(()=>{genBtn.textContent='번호 생성';genBtn.classList.remove('done','shimmer');},900);
+    ct.scrollTop=0;
+    Confetti.fire(40+selSets*8);
+    genBtn.textContent='생성 완료!';genBtn.classList.add('done','shimmer');
+    setTimeout(()=>Sound.success(),300);setTimeout(()=>Haptic.success(),300);
+    setTimeout(()=>{genBtn.textContent='번호 생성';genBtn.classList.remove('done','shimmer')},900);
 }
 
-// =============== CLEAR ===============
-document.getElementById('clrBtn').addEventListener('click',()=>{
-    Haptic.light(); Sound.clear();
-    document.getElementById('resScroll').innerHTML=`<div class="empty" id="emptyState"><div class="empty-icon">&#x1F3B2;</div><div>번호를 생성해 보세요</div></div>`;
-});
+// ===== CLEAR =====
+document.getElementById('clrBtn').addEventListener('click',()=>{Haptic.light();Sound.clear();document.getElementById('resScroll').innerHTML='<div class="empty" id="emptyState"><div class="empty-icon">&#x1F3B2;</div><div>번호를 생성해 보세요</div></div>'});
 
-// =============== INIT AUDIO ON FIRST TOUCH ===============
-document.addEventListener('touchstart',function init(){
-    try{const c=new(window.AudioContext||window.webkitAudioContext)(),b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);}catch(e){}
-    document.removeEventListener('touchstart',init);
-},{once:true});
+// ===== INIT AUDIO =====
+document.addEventListener('touchstart',function i(){try{const c=new(AudioContext||webkitAudioContext),b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0)}catch(e){}document.removeEventListener('touchstart',i)},{once:true});
 </script>
 </body>
 </html>
