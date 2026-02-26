@@ -184,12 +184,12 @@
         .set-top .tag{font-size:.95rem;color:var(--t3);background:var(--card);padding:6px 16px;border-radius:14px;border:1px solid var(--border);font-weight:600}
 
         /* ===== BALLS ===== */
-        .balls{display:flex;justify-content:center;gap:clamp(8px,3vw,18px)}
+        .balls{display:flex;justify-content:center;gap:clamp(8px,3vw,20px)}
         .b{
-            width:clamp(65px,16vw,95px);height:clamp(65px,16vw,95px);
+            width:clamp(70px,18vw,110px);height:clamp(70px,18vw,110px);
             border-radius:50%;display:inline-flex;
             align-items:center;justify-content:center;
-            font-weight:900;font-size:clamp(1.5rem,6vw,2.2rem);
+            font-weight:900;font-size:clamp(1.6rem,7vw,2.5rem);
             color:#fff;position:relative;
             text-shadow:0 1px 2px rgba(0,0,0,.2);
             animation:bPop .5s cubic-bezier(.34,1.56,.64,1) backwards;
@@ -205,19 +205,19 @@
         .b[data-range="5"]{background:linear-gradient(145deg,#6ee7b7,#10b981);box-shadow:0 5px 20px rgba(16,185,129,.4),inset 0 2px 4px rgba(255,255,255,.3)}
 
         /* ===== SPONSOR ===== */
-        .spon{flex-shrink:0;padding:10px;text-align:center}
-        .spon-t{font-size:.75rem;color:var(--t3);font-weight:700}
-        .spon-d{font-size:.68rem;color:var(--t3);opacity:.7;margin-top:1px}
+        .spon{flex-shrink:0;padding:25px 10px;text-align:center}
+        .spon-t{font-size:1rem;color:var(--t3);font-weight:700}
+        .spon-d{font-size:.9rem;color:var(--t3);opacity:.7;margin-top:2px}
 
         /* ===== RESPONSIVE ===== */
-        @media (min-width:500px){.app{max-width:560px;margin:0 auto;padding:0 8px}.b{width:56px;height:56px;font-size:1.2rem}}
+        @media (min-width:500px){.app{width:100%;max-width:100%;margin:0;padding:0}.b{width:100px;height:100px;font-size:2.2rem}}
         @media (max-width:360px){
-            .hdr h1{font-size:2.2rem}
-            .cat{padding:10px 16px;font-size:.9rem}
-            .pk-box{height:clamp(180px,32vh,350px)}
-            .pk-item{height:46px;font-size:1rem}.pk-item.active{font-size:1.15rem}.pk-hl{height:46px}
-            .b{width:46px;height:46px;font-size:1.1rem}.balls{gap:8px}
-            .m-desc{font-size:.85rem}
+            .hdr h1{font-size:3.2rem}
+            .cat{padding:16px 24px;font-size:1.1rem}
+            .pk-box{height:clamp(280px,48vh,600px)}
+            .pk-item{height:72px;font-size:1.25rem}.pk-item.active{font-size:1.5rem}.pk-hl{height:72px}
+            .b{width:60px;height:60px;font-size:1.4rem}.balls{gap:8px}
+            .m-desc{font-size:1.1rem}
         }
         @media (max-height:600px) and (orientation:landscape){
             .hdr{padding:4px 6px 2px}.hdr h1{font-size:1.3rem}.hdr .sub{display:none}
