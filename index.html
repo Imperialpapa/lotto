@@ -38,11 +38,11 @@
             padding:0 8px;
             padding-bottom:env(safe-area-inset-bottom,0);
         }
-        /* Spacers - 빈 공간을 균등 분배 */
-        .sp{flex:1}
+        .sp-top{flex:0}
+        .sp-bot{flex:1;min-height:12px}
 
         /* ===== HEADER ===== */
-        .hdr{text-align:center;padding:12px 0 4px;flex-shrink:0}
+        .hdr{text-align:center;padding:18px 0 6px;flex-shrink:0}
         .hdr h1{
             font-family:'Black Han Sans',sans-serif;
             font-size:clamp(2rem,8vw,2.8rem);
@@ -224,7 +224,7 @@
         }
         @media (max-height:600px) and (orientation:landscape){
             .hdr{padding:4px 0 2px}.hdr h1{font-size:1.3rem}.hdr .sub{display:none}
-            .sp{flex:.2}
+            .sp-bot{flex:.2}
             .ctrl{padding:8px;margin:4px 0}.pk-box{height:90px}.pk-scroll{padding:24px 0}.pk-item{height:36px}.pk-hl{height:36px}
             .gen{padding:12px;margin:4px 0}
             .res.has-results{max-height:30vh}
@@ -235,7 +235,7 @@
 <body>
 <canvas id="confetti"></canvas>
 <div class="app">
-    <div class="sp"></div>
+    <div class="sp-top"></div>
 
     <header class="hdr">
         <h1>LOTTO ORACLE</h1>
@@ -281,7 +281,7 @@
         <div class="res-scroll" id="resScroll"></div>
     </div>
 
-    <div class="sp"></div>
+    <div class="sp-bot"></div>
 
     <div class="spon">
         <div class="spon-t">후원 계좌: 카카오뱅크 3333-35-8084358</div>
