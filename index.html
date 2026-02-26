@@ -14,13 +14,19 @@
             --t1:#1a1d2e;--t2:#484b60;--t3:#888ba0;
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        html,body{
+            height:100%;width:100%;
+            overflow:hidden; /* 전체 페이지 바운스 방지 */
+        }
         body{
             font-family:'Noto Sans KR',-apple-system,sans-serif;
             background:var(--bg);color:var(--t1);
-            min-height:100%;min-height:100dvh;
+            min-height:100dvh;
             -webkit-font-smoothing:antialiased;
             -webkit-tap-highlight-color:transparent;
+            -webkit-text-size-adjust:100%;
             user-select:none;-webkit-user-select:none;
+            overscroll-behavior-y:none; /* 카카오톡 당겨서 새로고침 방지 */
         }
         body::before,body::after{content:'';position:fixed;border-radius:50%;filter:blur(80px);opacity:.45;pointer-events:none;z-index:0;animation:blob 14s ease-in-out infinite alternate}
         body::before{width:55vw;height:55vw;top:-12%;left:-12%;background:radial-gradient(circle,rgba(91,110,245,.28),transparent 70%)}
@@ -28,14 +34,14 @@
         @keyframes blob{0%{transform:translate(0,0) scale(1)}100%{transform:translate(25px,-18px) scale(1.08)}}
         #confetti{position:fixed;inset:0;pointer-events:none;z-index:100}
 
-        /* ===== LAYOUT (natural scroll) ===== */
+        /* ===== LAYOUT ===== */
         .app{
             position:relative;z-index:1;
-            min-height:100%;min-height:100dvh;
+            height:100dvh;width:100%;
             display:flex;flex-direction:column;
-            width:100%;max-width:100%;margin:0;
-            padding:0;
-            padding-bottom:env(safe-area-inset-bottom,0);
+            overflow-y:auto; /* 내부 스크롤 허용 */
+            -webkit-overflow-scrolling:touch;
+            padding-bottom:env(safe-area-inset-bottom,20px);
         }
         .sp-bot{flex:1;min-height:8px}
 
@@ -69,6 +75,7 @@
             transition:all .25s cubic-bezier(.34,1.56,.64,1);
             box-shadow:0 8px 0 rgba(0,0,0,.05), 0 15px 20px rgba(0,0,0,.1);
             position:relative;top:0;
+            touch-action:manipulation;
         }
         .cat.active{
             background:linear-gradient(135deg,var(--pri),var(--pri-lt));
@@ -153,6 +160,7 @@
         .gen:active{
             top:10px;box-shadow:0 5px 0 #3f4fb5, 0 10px 20px rgba(0,0,0,.2);
             transform:scale(.97);
+            touch-action:manipulation;
         }
         .gen.done{background:linear-gradient(135deg,var(--green),#1ad4a0)!important;box-shadow:0 6px 28px rgba(45,212,168,.4)!important;animation:none}
         .gen.shimmer::before{left:100%}
@@ -238,7 +246,7 @@
             .pk-box{height:360px}
             .pk-item{height:72px;font-size:1.85rem}.pk-item.active{font-size:2.4rem}.pk-hl{height:72px}
             .b{width:60px;height:60px;font-size:1.4rem}.balls{gap:8px}
-            .m-desc{font-size:1.6rem}
+            .m-marquee{font-size:2.4rem}
         }
         @media (max-height:600px) and (orientation:landscape){
             .hdr{padding:4px 6px 2px}.hdr h1{font-size:1.3rem}.hdr .sub{display:none}
