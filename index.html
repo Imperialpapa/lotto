@@ -63,7 +63,7 @@
             flex-shrink:0;padding:20px 32px;
             border-radius:36px;border:1.5px solid var(--border);
             background:var(--card);color:var(--t2);
-            font-size:1.85rem;font-weight:600;
+            font-size:3.3rem;font-weight:600;
             font-family:'Noto Sans KR',sans-serif;
             cursor:pointer;white-space:nowrap;
             transition:all .25s cubic-bezier(.34,1.56,.64,1);
@@ -86,9 +86,9 @@
             margin:15px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
         }
         .pk-row{display:flex;gap:12px}
-        .pk-wrap{flex:1;min-width:0}
-        .pk-wrap.sm{flex:0 0 140px}
-        .pk-lbl{font-size:1.7rem;color:var(--t3);margin-bottom:12px;font-weight:600;padding-left:4px;letter-spacing:1px}
+        .pk-wrap{flex:5;min-width:0}
+        .pk-wrap.sm{flex:2;min-width:0}
+        .pk-lbl{font-size:2.5rem;color:var(--t3);margin-bottom:12px;font-weight:600;padding-left:4px;letter-spacing:1px}
         .pk-box{
             position:relative;height:400px;overflow:hidden;
             background:var(--surface);border-radius:20px;border:1px solid var(--border);
@@ -154,10 +154,10 @@
             justify-content:space-between;align-items:center;
             border-bottom:1px solid var(--border);background:var(--surface);
         }
-        .res-top span{font-size:1.7rem;color:var(--t2);font-weight:700;letter-spacing:1px}
+        .res-top span{font-size:2.55rem;color:var(--t2);font-weight:700;letter-spacing:1px}
         .clr-btn{
             background:var(--card);border:1px solid var(--border);
-            color:var(--t3);font-size:1.55rem;padding:10px 22px;
+            color:var(--t3);font-size:2.35rem;padding:10px 22px;
             border-radius:16px;cursor:pointer;
             font-family:'Noto Sans KR',sans-serif;font-weight:600;
             transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.04);
@@ -180,8 +180,8 @@
         }
         @keyframes setIn{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
         .set-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
-        .set-top strong{font-size:1.95rem;color:var(--pri);font-weight:800}
-        .set-top .tag{font-size:1.45rem;color:var(--t3);background:var(--card);padding:6px 16px;border-radius:14px;border:1px solid var(--border);font-weight:600}
+        .set-top strong{font-size:2.9rem;color:var(--pri);font-weight:800}
+        .set-top .tag{font-size:2.15rem;color:var(--t3);background:var(--card);padding:6px 16px;border-radius:14px;border:1px solid var(--border);font-weight:600}
 
         /* ===== BALLS ===== */
         .balls{display:flex;justify-content:center;gap:clamp(8px,3vw,20px)}
@@ -206,14 +206,14 @@
 
         /* ===== SPONSOR ===== */
         .spon{flex-shrink:0;padding:25px 10px;text-align:center}
-        .spon-t{font-size:1.5rem;color:var(--t3);font-weight:700}
-        .spon-d{font-size:1.35rem;color:var(--t3);opacity:.7;margin-top:2px}
+        .spon-t{font-size:2.25rem;color:var(--t3);font-weight:700}
+        .spon-d{font-size:2.0rem;color:var(--t3);opacity:.7;margin-top:2px}
 
         /* ===== RESPONSIVE ===== */
         @media (min-width:500px){.app{width:100%;max-width:100%;margin:0;padding:0}.b{width:100px;height:100px;font-size:2.2rem}}
         @media (max-width:360px){
             .hdr h1{font-size:3.2rem}
-            .cat{padding:16px 24px;font-size:1.6rem}
+            .cat{padding:16px 24px;font-size:1.92rem}
             .pk-box{height:360px}
             .pk-item{height:72px;font-size:1.85rem}.pk-item.active{font-size:2.4rem}.pk-hl{height:72px}
             .b{width:60px;height:60px;font-size:1.4rem}.balls{gap:8px}
@@ -268,10 +268,6 @@
 
     <!-- 결과: 비어있으면 숨김, 생성하면 슬라이드로 나타남 -->
     <div class="res empty" id="resArea">
-        <div class="res-top">
-            <span>생성 결과</span>
-            <button class="clr-btn" id="clrBtn">초기화</button>
-        </div>
         <div class="res-scroll" id="resScroll"></div>
     </div>
 
@@ -332,21 +328,66 @@ let curCat='basic',selMethod='90',selSets=5;
 // ===== PICKER =====
 function createPicker(id,opts,defIdx,onSelect){
     const el=document.getElementById(id);
-    const ih=window.innerWidth<=360?72:80;
     const cnt=opts.length,cl=Math.min(3,cnt);
     let val=opts[defIdx].value,scrolling=false,lastVal=null;
     el.innerHTML='';
-    const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;d.style.height=ih+'px';return d};
+    const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;return d};
     for(let i=cnt-cl;i<cnt;i++)el.appendChild(mk(opts[i],i,true));
     opts.forEach((o,i)=>el.appendChild(mk(o,i,false)));
     for(let i=0;i<cl;i++)el.appendChild(mk(opts[i],i,true));
     const items=el.querySelectorAll('.pk-item');
-    function upd(){const ci=Math.round(el.scrollTop/ih);items.forEach((it,idx)=>{if(idx===ci){it.classList.add('active');val=it.dataset.value;if(val!==lastVal){lastVal=val;Haptic.tick();Sound.tick();onSelect(val)}}else it.classList.remove('active')})}
-    function scr(){if(scrolling)return;const st=el.scrollTop;if(st<(cl-1)*ih){scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50)}else if(st>(cl+cnt-1)*ih){scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50)}upd()}
+
+    function getIH(){return items[0].offsetHeight || 80}
+
+    function upd(){
+        const ih=getIH();
+        const ci=Math.round(el.scrollTop/ih);
+        items.forEach((it,idx)=>{
+            if(idx===ci){
+                it.classList.add('active');
+                val=it.dataset.value;
+                if(val!==lastVal){
+                    lastVal=val;Haptic.tick();Sound.tick();onSelect(val);
+                }
+            }else it.classList.remove('active');
+        });
+    }
+
+    function scr(){
+        if(scrolling)return;
+        const ih=getIH();
+        const st=el.scrollTop;
+        if(st<(cl-1)*ih){
+            scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50);
+        }else if(st>(cl+cnt-1)*ih){
+            scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50);
+        }
+        upd();
+    }
+
+    function refresh(){
+        const ih=getIH();
+        el.style.padding=Math.floor((el.parentElement.clientHeight-ih)/2)+'px 0';
+        // 현재 선택된 값의 위치로 스크롤 복구
+        let targetIdx = opts.findIndex(o => o.value === val);
+        if(targetIdx===-1) targetIdx = defIdx;
+        el.scrollTop=(cl+targetIdx)*ih;
+        upd();
+    }
+
     el.addEventListener('scroll',scr);
-    items.forEach(it=>{it.addEventListener('click',()=>{Haptic.light();Sound.click();el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'})})});
-    el.style.padding=Math.floor((el.parentElement.clientHeight-ih)/2)+'px 0';
-    setTimeout(()=>{el.scrollTop=(cl+defIdx)*ih;upd()},60);
+    items.forEach(it=>{
+        it.addEventListener('click',()=>{
+            Haptic.light();Sound.click();
+            const ih=getIH();
+            el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'});
+        });
+    });
+
+    window.addEventListener('resize', refresh);
+    // 초기화
+    setTimeout(refresh, 100);
+    
     return()=>val;
 }
 
@@ -372,13 +413,14 @@ function generate(){
     // 결과 영역 표시
     resArea.classList.remove('empty');
     resArea.classList.add('has-results');
+    ct.innerHTML=''; // 기존 결과 초기화
 
     for(let s=1;s<=selSets;s++){
         const nums=gen.fn().sort((a,b)=>a-b);
         const el=document.createElement('div');
         el.className='set';el.style.animationDelay=(s-1)*.08+'s';
-        el.innerHTML=`<div class="set-top"><strong>${s}세트</strong><span class="tag">${gen.name}</span></div><div class="balls">${nums.map((n,i)=>`<span class="b" data-range="${rng(n)}" style="animation-delay:${(s-1)*.08+i*.07}s">${n}</span>`).join('')}</div>`;
-        ct.insertBefore(el,ct.firstChild);
+        el.innerHTML=`<div class="balls">${nums.map((n,i)=>`<span class="b" data-range="${rng(n)}" style="animation-delay:${(s-1)*.08+i*.07}s">${n}</span>`).join('')}</div>`;
+        ct.appendChild(el); // 순서대로 추가
         nums.forEach((_,i)=>Sound.ballPop(i+(s-1)*6));
     }
     ct.scrollTop=0;
@@ -387,14 +429,6 @@ function generate(){
     setTimeout(()=>Sound.success(),300);setTimeout(()=>Haptic.success(),300);
     setTimeout(()=>{genBtn.textContent='번호 생성';genBtn.classList.remove('done','shimmer')},900);
 }
-
-// ===== CLEAR =====
-document.getElementById('clrBtn').addEventListener('click',()=>{
-    Haptic.light();Sound.clear();
-    document.getElementById('resScroll').innerHTML='';
-    resArea.classList.remove('has-results');
-    resArea.classList.add('empty');
-});
 
 // ===== INIT AUDIO =====
 document.addEventListener('touchstart',function i(){try{const c=new(AudioContext||webkitAudioContext),b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0)}catch(e){}document.removeEventListener('touchstart',i)},{once:true});
