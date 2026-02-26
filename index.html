@@ -33,37 +33,37 @@
             position:relative;z-index:1;
             min-height:100%;min-height:100dvh;
             display:flex;flex-direction:column;
-            max-width:100%;margin:0 auto;
+            width:100%;max-width:100%;margin:0;
             padding:0;
             padding-bottom:env(safe-area-inset-bottom,0);
         }
         .sp-bot{flex:1;min-height:8px}
 
         /* ===== HEADER ===== */
-        .hdr{text-align:center;padding:32px 10px 14px;flex-shrink:0}
+        .hdr{text-align:center;padding:45px 0 20px;flex-shrink:0}
         .hdr h1{
             font-family:'Black Han Sans',sans-serif;
-            font-size:clamp(2.8rem,13vw,4rem);
+            font-size:clamp(3.5rem,18vw,5.5rem);
             background:linear-gradient(135deg,var(--pri),var(--pink),var(--orange));
             -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-            background-clip:text;letter-spacing:4px;line-height:1.1;
+            background-clip:text;letter-spacing:1px;line-height:1;
             animation:shimmer 4s ease-in-out infinite;background-size:200% 200%;
         }
         @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
-        .hdr .sub{font-size:.95rem;color:var(--t3);margin-top:6px;letter-spacing:4px;font-weight:400}
+        .hdr .sub{font-size:1.05rem;color:var(--t3);margin-top:8px;letter-spacing:4px;font-weight:400}
 
         /* ===== CATEGORY TABS ===== */
         .cats{
-            display:flex;gap:12px;flex-shrink:0;
+            display:flex;gap:14px;flex-shrink:0;
             overflow-x:auto;scrollbar-width:none;
-            padding:12px 6px;
+            padding:15px 6px;
         }
         .cats::-webkit-scrollbar{display:none}
         .cat{
-            flex-shrink:0;padding:15px 24px;
-            border-radius:28px;border:1.5px solid var(--border);
+            flex-shrink:0;padding:20px 32px;
+            border-radius:36px;border:1.5px solid var(--border);
             background:var(--card);color:var(--t2);
-            font-size:1.05rem;font-weight:600;
+            font-size:1.25rem;font-weight:600;
             font-family:'Noto Sans KR',sans-serif;
             cursor:pointer;white-space:nowrap;
             transition:all .25s cubic-bezier(.34,1.56,.64,1);
@@ -81,48 +81,48 @@
         .ctrl{
             flex-shrink:0;
             background:var(--card);
-            border-radius:20px;padding:20px 10px;
+            border-radius:0;padding:30px 10px;
             box-shadow:0 6px 24px rgba(91,110,245,.12);
-            margin:12px 4px;border:1px solid var(--border);
+            margin:15px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);
         }
-        .pk-row{display:flex;gap:10px}
+        .pk-row{display:flex;gap:12px}
         .pk-wrap{flex:1;min-width:0}
-        .pk-wrap.sm{flex:0 0 100px}
-        .pk-lbl{font-size:.95rem;color:var(--t3);margin-bottom:8px;font-weight:600;padding-left:4px;letter-spacing:1px}
+        .pk-wrap.sm{flex:0 0 120px}
+        .pk-lbl{font-size:1.15rem;color:var(--t3);margin-bottom:12px;font-weight:600;padding-left:4px;letter-spacing:1px}
         .pk-box{
-            position:relative;height:clamp(250px,45vh,600px);overflow:hidden;
-            background:var(--surface);border-radius:16px;border:1px solid var(--border);
+            position:relative;height:clamp(350px,55vh,800px);overflow:hidden;
+            background:var(--surface);border-radius:20px;border:1px solid var(--border);
         }
         .pk-hl{
             position:absolute;top:50%;left:8px;right:8px;
-            height:64px;transform:translateY(-50%);
+            height:80px;transform:translateY(-50%);
             background:linear-gradient(90deg,var(--pri-pale),rgba(91,110,245,.04));
-            border-radius:14px;pointer-events:none;
+            border-radius:18px;pointer-events:none;
             border:2px solid rgba(91,110,245,.2);
         }
         .pk-scroll{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
         .pk-scroll::-webkit-scrollbar{display:none}
         .pk-item{
-            height:64px;display:flex;align-items:center;justify-content:center;
-            scroll-snap-align:center;font-size:1.15rem;color:var(--t3);
+            height:80px;display:flex;align-items:center;justify-content:center;
+            scroll-snap-align:center;font-size:1.4rem;color:var(--t3);
             transition:all .15s ease;cursor:pointer;padding:0 6px;
         }
-        .pk-item.active{color:var(--pri);font-weight:800;font-size:1.4rem}
+        .pk-item.active{color:var(--pri);font-weight:800;font-size:1.8rem}
         .m-desc{
-            margin-top:12px;padding:14px 18px;
-            background:var(--pri-pale);border-radius:14px;
-            border-left:5px solid var(--pri);
-            font-size:1rem;color:var(--t2);line-height:1.5;
+            margin-top:20px;padding:20px 25px;
+            background:var(--pri-pale);border-radius:18px;
+            border-left:8px solid var(--pri);
+            font-size:1.2rem;color:var(--t2);line-height:1.5;
         }
 
         /* ===== GENERATE BUTTON ===== */
         .gen{
-            flex-shrink:0;display:block;width:calc(100% - 8px);
-            padding:26px;margin:12px 4px;border:none;border-radius:20px;
+            flex-shrink:0;display:block;width:100%;
+            padding:38px;margin:15px 0;border:none;border-radius:0;
             background:linear-gradient(135deg,var(--pri),var(--pri-lt),var(--cyan));
             background-size:200% 200%;color:#fff;
             font-family:'Black Han Sans',sans-serif;
-            font-size:clamp(1.8rem,7vw,2.4rem);letter-spacing:8px;
+            font-size:clamp(2.4rem,11vw,3.5rem);letter-spacing:12px;
             cursor:pointer;position:relative;overflow:hidden;
             box-shadow:0 10px 40px rgba(91,110,245,.4);
             animation:pulse 3s ease-in-out infinite;transition:all .2s ease;
@@ -139,32 +139,32 @@
         /* ===== RESULTS (숨겨졌다가 생성 시 나타남) ===== */
         .res{
             overflow:hidden;
-            border-radius:24px;
+            border-radius:0;
             transition:opacity .3s ease, margin .3s ease;
         }
         .res.empty{max-height:0;opacity:0;margin:0}
         .res.has-results{
-            opacity:1;margin:0 4px 8px;
+            opacity:1;margin:0 0 15px;
             background:var(--card);
             box-shadow:0 6px 30px rgba(91,110,245,.12);
-            border:1px solid var(--border);
+            border-top:1px solid var(--border);border-bottom:1px solid var(--border);
         }
         .res-top{
-            padding:14px 18px;display:flex;
+            padding:18px 22px;display:flex;
             justify-content:space-between;align-items:center;
             border-bottom:1px solid var(--border);background:var(--surface);
         }
-        .res-top span{font-size:.95rem;color:var(--t2);font-weight:700;letter-spacing:1px}
+        .res-top span{font-size:1.15rem;color:var(--t2);font-weight:700;letter-spacing:1px}
         .clr-btn{
             background:var(--card);border:1px solid var(--border);
-            color:var(--t3);font-size:.9rem;padding:8px 18px;
-            border-radius:14px;cursor:pointer;
+            color:var(--t3);font-size:1.05rem;padding:10px 22px;
+            border-radius:16px;cursor:pointer;
             font-family:'Noto Sans KR',sans-serif;font-weight:600;
             transition:all .2s;box-shadow:0 2px 6px rgba(0,0,0,.04);
         }
         .clr-btn:active{background:#fee;color:var(--pink);border-color:var(--pink)}
         .res-scroll{
-            padding:14px 8px;
+            padding:18px 10px;
         }
         .res-scroll::-webkit-scrollbar{width:4px}
         .res-scroll::-webkit-scrollbar-track{background:transparent}
@@ -172,24 +172,24 @@
 
         /* ===== SET CARD ===== */
         .set{
-            padding:20px 10px;margin-bottom:14px;
-            background:var(--surface);border-radius:20px;
-            border:1px solid var(--border);
+            padding:25px 12px;margin-bottom:18px;
+            background:var(--surface);border-radius:0;
+            border-top:1px solid var(--border);border-bottom:1px solid var(--border);
             animation:setIn .4s cubic-bezier(.34,1.56,.64,1) backwards;
             box-shadow:0 3px 14px rgba(91,110,245,.08);
         }
         @keyframes setIn{from{opacity:0;transform:translateY(14px) scale(.95)}to{opacity:1;transform:none}}
-        .set-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-        .set-top strong{font-size:1.1rem;color:var(--pri);font-weight:800}
-        .set-top .tag{font-size:.8rem;color:var(--t3);background:var(--card);padding:4px 12px;border-radius:12px;border:1px solid var(--border);font-weight:600}
+        .set-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+        .set-top strong{font-size:1.3rem;color:var(--pri);font-weight:800}
+        .set-top .tag{font-size:.95rem;color:var(--t3);background:var(--card);padding:6px 16px;border-radius:14px;border:1px solid var(--border);font-weight:600}
 
         /* ===== BALLS ===== */
-        .balls{display:flex;justify-content:center;gap:clamp(6px,2vw,12px)}
+        .balls{display:flex;justify-content:center;gap:clamp(8px,3vw,18px)}
         .b{
-            width:clamp(54px,15vw,72px);height:clamp(54px,15vw,72px);
+            width:clamp(65px,16vw,95px);height:clamp(65px,16vw,95px);
             border-radius:50%;display:inline-flex;
             align-items:center;justify-content:center;
-            font-weight:900;font-size:clamp(1.2rem,4.5vw,1.6rem);
+            font-weight:900;font-size:clamp(1.5rem,6vw,2.2rem);
             color:#fff;position:relative;
             text-shadow:0 1px 2px rgba(0,0,0,.2);
             animation:bPop .5s cubic-bezier(.34,1.56,.64,1) backwards;
@@ -233,8 +233,7 @@
 <canvas id="confetti"></canvas>
 <div class="app">
     <header class="hdr">
-        <h1>LOTTO ORACLE</h1>
-        <div class="sub">통계 기반 번호 생성기</div>
+        <h1>로또 오라클</h1>
     </header>
 
     <div class="cats">
@@ -333,7 +332,7 @@ let curCat='basic',selMethod='90',selSets=5;
 // ===== PICKER =====
 function createPicker(id,opts,defIdx,onSelect){
     const el=document.getElementById(id);
-    const ih=window.innerWidth<=360?56:64;
+    const ih=window.innerWidth<=360?72:80;
     const cnt=opts.length,cl=Math.min(3,cnt);
     let val=opts[defIdx].value,scrolling=false,lastVal=null;
     el.innerHTML='';
