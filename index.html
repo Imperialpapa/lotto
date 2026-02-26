@@ -8,532 +8,634 @@
     <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-deep: #0a0a0f;
-            --bg-card: #13131a;
-            --bg-surface: #1a1a24;
-            --gold: #d4a843;
-            --gold-bright: #f0c75e;
-            --gold-dim: #8a6d2b;
-            --text-primary: #e8e4dc;
-            --text-secondary: #8a8690;
-            --text-muted: #4a4650;
-            --accent-blue: #4a7cff;
-            --accent-red: #ff4a6a;
-            --accent-green: #3adf7c;
-            --glow-gold: rgba(212, 168, 67, 0.3);
-            --glow-blue: rgba(74, 124, 255, 0.3);
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 22px;
-            --radius-xl: 30px;
+            --bg: #f0f4ff;
+            --card: #ffffff;
+            --surface: #f7f8fc;
+            --border: rgba(0,0,0,0.06);
+            --primary: #5b6ef5;
+            --primary-light: #8b97ff;
+            --primary-pale: #eef0ff;
+            --accent-pink: #ff6b9d;
+            --accent-orange: #ff9a56;
+            --accent-green: #2dd4a8;
+            --accent-cyan: #38c9ff;
+            --text: #1a1d2e;
+            --text2: #5a5d72;
+            --text3: #9a9db2;
+            --shadow-sm: 0 2px 8px rgba(91,110,245,0.08);
+            --shadow-md: 0 4px 20px rgba(91,110,245,0.12);
+            --shadow-lg: 0 8px 40px rgba(91,110,245,0.15);
+            --safe-b: env(safe-area-inset-bottom, 0px);
+            --safe-l: env(safe-area-inset-left, 0px);
+            --safe-r: env(safe-area-inset-right, 0px);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { font-size: 16px; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; height: 100%; overflow: hidden; }
 
         body {
             font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-deep);
-            color: var(--text-primary);
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
+            height: 100%; height: 100dvh;
+            overflow: hidden;
             -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none; -webkit-user-select: none;
         }
 
-        /* === NOISE TEXTURE OVERLAY === */
-        body::before {
+        /* === ANIMATED BG BLOBS === */
+        body::before, body::after {
             content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 0;
+            animation: blobFloat 12s ease-in-out infinite alternate;
+        }
+        body::before {
+            width: 50vw; height: 50vw;
+            top: -10%; left: -10%;
+            background: radial-gradient(circle, rgba(91,110,245,0.25), transparent 70%);
+        }
+        body::after {
+            width: 45vw; height: 45vw;
+            bottom: -5%; right: -10%;
+            background: radial-gradient(circle, rgba(255,107,157,0.2), transparent 70%);
+            animation-delay: -6s;
+            animation-direction: alternate-reverse;
+        }
+        @keyframes blobFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, -20px) scale(1.1); }
+        }
+
+        /* === CONFETTI CANVAS === */
+        #confetti {
             position: fixed;
             inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
             pointer-events: none;
-            z-index: 0;
+            z-index: 100;
         }
 
-        /* === AMBIENT GLOW === */
-        body::after {
-            content: '';
-            position: fixed;
-            top: -30%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 140vw;
-            height: 60vh;
-            background: radial-gradient(ellipse, rgba(212, 168, 67, 0.06) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* === MAIN SHELL === */
-        .shell {
-            position: relative;
-            z-index: 1;
-            max-width: 520px;
+        /* === LAYOUT === */
+        .app {
+            position: relative; z-index: 1;
+            height: 100%; height: 100dvh;
+            display: flex; flex-direction: column;
+            max-width: 600px;
             margin: 0 auto;
-            padding: 16px 12px env(safe-area-inset-bottom, 16px);
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
+            padding: 0 8px;
+            padding-bottom: var(--safe-b);
+            padding-left: max(8px, var(--safe-l));
+            padding-right: max(8px, var(--safe-r));
         }
 
         /* === HEADER === */
-        .header {
+        .hdr {
             text-align: center;
-            padding: 24px 0 20px;
+            padding: 14px 0 8px;
+            flex-shrink: 0;
         }
-        .header h1 {
+        .hdr h1 {
             font-family: 'Black Han Sans', sans-serif;
-            font-size: clamp(1.6rem, 5vw, 2.2rem);
-            color: var(--gold-bright);
+            font-size: clamp(1.5rem, 5.5vw, 2.2rem);
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink), var(--accent-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             letter-spacing: 2px;
-            text-shadow: 0 0 30px var(--glow-gold), 0 0 60px rgba(212, 168, 67, 0.15);
-            line-height: 1.2;
+            line-height: 1.1;
+            animation: titleShimmer 4s ease-in-out infinite;
+            background-size: 200% 200%;
         }
-        .header .subtitle {
-            font-size: clamp(0.7rem, 2vw, 0.8rem);
-            color: var(--text-muted);
-            margin-top: 6px;
+        @keyframes titleShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .hdr .sub {
+            font-size: 0.62rem;
+            color: var(--text3);
+            margin-top: 2px;
             letter-spacing: 4px;
             text-transform: uppercase;
-            font-weight: 300;
+            font-weight: 400;
         }
 
         /* === CATEGORY TABS === */
-        .category-bar {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 12px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            padding: 2px 0;
+        .cats {
+            display: flex; gap: 6px; flex-shrink: 0;
+            overflow-x: auto; scrollbar-width: none;
+            padding: 4px 2px; margin-bottom: 8px;
         }
-        .category-bar::-webkit-scrollbar { display: none; }
-        .cat-tab {
+        .cats::-webkit-scrollbar { display: none; }
+        .cat {
             flex-shrink: 0;
-            padding: 7px 14px;
+            padding: 7px 15px;
             border-radius: 20px;
-            border: 1px solid var(--text-muted);
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 0.75rem;
+            border: 1.5px solid var(--border);
+            background: var(--card);
+            color: var(--text2);
+            font-size: 0.72rem;
             font-family: 'Noto Sans KR', sans-serif;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             white-space: nowrap;
-            -webkit-tap-highlight-color: transparent;
+            box-shadow: var(--shadow-sm);
         }
-        .cat-tab.active {
-            background: var(--gold);
-            color: var(--bg-deep);
-            border-color: var(--gold);
-            font-weight: 700;
-            box-shadow: 0 0 16px var(--glow-gold);
+        .cat.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(91,110,245,0.35);
+            transform: scale(1.05);
         }
-        .cat-tab:not(.active):hover {
-            border-color: var(--gold-dim);
-            color: var(--gold);
-        }
+        .cat:active { transform: scale(0.95); }
 
-        /* === PICKER SECTION === */
-        .controls {
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.04);
-            margin-bottom: 14px;
+        /* === CONTROLS === */
+        .ctrl {
+            flex-shrink: 0;
+            background: var(--card);
+            border-radius: 18px;
+            padding: 12px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 8px;
+            border: 1px solid var(--border);
         }
-        .picker-row {
-            display: flex;
-            gap: 10px;
-        }
-        .picker-wrapper { flex: 1; min-width: 0; }
-        .picker-wrapper.small { flex: 0 0 76px; }
-        .picker-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
+        .pk-row { display: flex; gap: 8px; }
+        .pk-wrap { flex: 1; min-width: 0; }
+        .pk-wrap.sm { flex: 0 0 76px; }
+        .pk-lbl {
+            font-size: 0.6rem;
+            color: var(--text3);
+            margin-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 2px;
-            font-weight: 500;
+            font-weight: 600;
+            padding-left: 4px;
         }
-        .picker-container {
+        .pk-box {
             position: relative;
-            height: 140px;
+            height: 120px;
             overflow: hidden;
-            background: var(--bg-surface);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255,255,255,0.03);
+            background: var(--surface);
+            border-radius: 14px;
+            border: 1px solid var(--border);
         }
-        .picker-highlight {
+        .pk-hl {
             position: absolute;
-            top: 50%;
-            left: 6px; right: 6px;
-            height: 38px;
+            top: 50%; left: 5px; right: 5px;
+            height: 36px;
             transform: translateY(-50%);
-            background: linear-gradient(90deg, rgba(212,168,67,0.12), rgba(212,168,67,0.06));
-            border-radius: 8px;
+            background: linear-gradient(90deg, var(--primary-pale), rgba(91,110,245,0.06));
+            border-radius: 10px;
             pointer-events: none;
-            border: 1px solid rgba(212,168,67,0.2);
+            border: 1.5px solid rgba(91,110,245,0.2);
         }
-        .picker-scroll {
+        .pk-scroll {
             height: 100%;
             overflow-y: scroll;
             scroll-snap-type: y mandatory;
             -webkit-overflow-scrolling: touch;
-            padding: 51px 0;
+            padding: 42px 0;
         }
-        .picker-scroll::-webkit-scrollbar { display: none; }
-        .picker-item {
-            height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .pk-scroll::-webkit-scrollbar { display: none; }
+        .pk-item {
+            height: 36px;
+            display: flex; align-items: center; justify-content: center;
             scroll-snap-align: center;
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
+            font-size: 0.78rem;
+            color: var(--text3);
+            transition: all 0.15s ease;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
             padding: 0 4px;
         }
-        .picker-item.active {
-            color: var(--gold-bright);
-            font-weight: 700;
-            font-size: 0.88rem;
-            text-shadow: 0 0 12px var(--glow-gold);
+        .pk-item.active {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 0.86rem;
         }
 
-        /* === METHOD INFO TOOLTIP === */
-        .method-info {
-            margin-top: 10px;
-            padding: 10px 14px;
-            background: rgba(212,168,67,0.05);
-            border-radius: var(--radius-sm);
-            border-left: 3px solid var(--gold-dim);
-            font-size: 0.72rem;
-            color: var(--text-secondary);
+        /* Method desc */
+        .m-desc {
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: var(--primary-pale);
+            border-radius: 10px;
+            border-left: 3px solid var(--primary);
+            font-size: 0.66rem;
+            color: var(--text2);
             line-height: 1.5;
-            transition: all 0.3s ease;
         }
 
         /* === GENERATE BUTTON === */
-        .gen-btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            margin-bottom: 14px;
+        .gen {
+            flex-shrink: 0;
+            display: block; width: 100%;
+            padding: 15px;
+            margin-bottom: 8px;
             border: none;
-            border-radius: var(--radius-md);
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
-            color: var(--bg-deep);
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--accent-cyan));
+            background-size: 200% 200%;
+            color: #fff;
             font-family: 'Black Han Sans', sans-serif;
-            font-size: clamp(1rem, 3vw, 1.2rem);
-            letter-spacing: 3px;
+            font-size: clamp(1.05rem, 4vw, 1.3rem);
+            letter-spacing: 4px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-            overflow: hidden;
+            transition: all 0.2s ease;
+            position: relative; overflow: hidden;
+            box-shadow: 0 6px 24px rgba(91,110,245,0.35);
+            animation: genPulse 3s ease-in-out infinite;
         }
-        .gen-btn::before {
+        @keyframes genPulse {
+            0%, 100% { background-position: 0% 50%; box-shadow: 0 6px 24px rgba(91,110,245,0.35); }
+            50% { background-position: 100% 50%; box-shadow: 0 6px 30px rgba(56,201,255,0.35); }
+        }
+        .gen::before {
             content: '';
             position: absolute;
             top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.6s ease;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
         }
-        .gen-btn:hover::before { left: 100%; }
-        .gen-btn:hover {
-            box-shadow: 0 4px 30px var(--glow-gold), 0 0 60px rgba(212,168,67,0.15);
-            transform: translateY(-1px);
+        .gen:active {
+            transform: scale(0.96);
+            box-shadow: 0 3px 12px rgba(91,110,245,0.3);
         }
-        .gen-btn:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 10px var(--glow-gold);
+        .gen.done {
+            background: linear-gradient(135deg, var(--accent-green), #1ad4a0) !important;
+            box-shadow: 0 6px 24px rgba(45,212,168,0.4) !important;
+            animation: none;
         }
+        .gen.shimmer::before { left: 100%; }
 
-        /* === RESULTS AREA === */
-        .results {
-            flex: 1;
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255,255,255,0.04);
+        /* === RESULTS === */
+        .res {
+            flex: 1; min-height: 0;
+            background: var(--card);
+            border-radius: 18px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            display: flex; flex-direction: column;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            margin-bottom: 6px;
         }
-        .results-header {
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
+        .res-top {
+            padding: 9px 14px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            background: var(--surface);
         }
-        .results-header span {
-            font-size: 0.7rem;
-            color: var(--text-muted);
+        .res-top span {
+            font-size: 0.65rem;
+            color: var(--text3);
             letter-spacing: 2px;
             text-transform: uppercase;
-            font-weight: 500;
+            font-weight: 600;
         }
-        .clear-btn {
-            background: none;
-            border: 1px solid var(--text-muted);
-            color: var(--text-muted);
-            font-size: 0.65rem;
-            padding: 4px 10px;
-            border-radius: 12px;
+        .clr-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text3);
+            font-size: 0.6rem;
+            padding: 4px 12px;
+            border-radius: 10px;
             cursor: pointer;
             font-family: 'Noto Sans KR', sans-serif;
+            font-weight: 500;
             transition: all 0.2s;
-            -webkit-tap-highlight-color: transparent;
+            box-shadow: var(--shadow-sm);
         }
-        .clear-btn:hover {
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-        }
-        .results-scroll {
+        .clr-btn:active { background: #fee; color: var(--accent-pink); border-color: var(--accent-pink); }
+        .res-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 10px;
-            max-height: 400px;
-            scroll-behavior: smooth;
+            padding: 8px;
+            overscroll-behavior: contain;
         }
-        .results-scroll::-webkit-scrollbar { width: 4px; }
-        .results-scroll::-webkit-scrollbar-track { background: transparent; }
-        .results-scroll::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 2px; }
+        .res-scroll::-webkit-scrollbar { width: 3px; }
+        .res-scroll::-webkit-scrollbar-track { background: transparent; }
+        .res-scroll::-webkit-scrollbar-thumb { background: rgba(91,110,245,0.15); border-radius: 2px; }
 
-        .result-empty {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+        .empty {
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            height: 100%;
+            color: var(--text3);
+            font-size: 0.78rem; gap: 8px;
         }
-        .result-empty .icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            opacity: 0.4;
+        .empty-icon {
+            font-size: 2.6rem;
+            animation: emptyBounce 2s ease-in-out infinite;
+        }
+        @keyframes emptyBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.05); }
         }
 
-        /* === SINGLE SET === */
+        /* === SET CARD === */
         .set {
-            padding: 14px;
-            margin-bottom: 8px;
-            background: var(--bg-surface);
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(255,255,255,0.03);
-            animation: setReveal 0.4s ease backwards;
+            padding: 12px 14px;
+            margin-bottom: 6px;
+            background: var(--surface);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            animation: setIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            box-shadow: var(--shadow-sm);
         }
-        @keyframes setReveal {
-            from { opacity: 0; transform: translateY(12px) scale(0.97); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes setIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.94); }
+            to { opacity: 1; transform: none; }
         }
-        .set-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
+        .set-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
         }
-        .set-header strong {
-            font-size: 0.8rem;
-            color: var(--gold);
-            font-weight: 700;
+        .set-top strong {
+            font-size: 0.78rem;
+            color: var(--primary);
+            font-weight: 800;
         }
-        .set-header .method-tag {
-            font-size: 0.6rem;
-            color: var(--text-muted);
-            background: rgba(255,255,255,0.04);
-            padding: 3px 8px;
-            border-radius: 10px;
-            letter-spacing: 0.5px;
-        }
-        .numbers {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 8px;
+        .set-top .tag {
+            font-size: 0.55rem;
+            color: var(--text3);
+            background: var(--card);
+            padding: 2px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-weight: 500;
         }
 
-        /* === NUMBER BALLS === */
-        .ball {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
+        /* === BALLS === */
+        .balls {
+            display: flex;
             justify-content: center;
+            gap: clamp(6px, 2.2vw, 12px);
+        }
+        .b {
+            width: clamp(42px, 12vw, 56px);
+            height: clamp(42px, 12vw, 56px);
+            border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
             font-weight: 900;
-            font-size: 0.9rem;
+            font-size: clamp(0.9rem, 3.2vw, 1.15rem);
             color: #fff;
             position: relative;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            animation: ballPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
-            transition: transform 0.2s ease;
-            cursor: default;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            animation: bPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+            transition: transform 0.15s ease;
         }
-        .ball:hover { transform: scale(1.12); }
-        .ball::after {
+        .b:active { transform: scale(1.18) rotate(-5deg); }
+        .b::after {
             content: '';
             position: absolute;
-            top: 5px; left: 8px;
-            width: 10px; height: 6px;
-            background: rgba(255,255,255,0.35);
+            top: 14%; left: 20%;
+            width: 24%; height: 18%;
+            background: rgba(255,255,255,0.5);
             border-radius: 50%;
-            transform: rotate(-20deg);
+            transform: rotate(-30deg);
         }
-        @keyframes ballPop {
-            from { opacity: 0; transform: scale(0.3) rotate(-20deg); }
-            to { opacity: 1; transform: scale(1) rotate(0); }
+        @keyframes bPop {
+            0% { opacity: 0; transform: scale(0) rotate(-40deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(8deg); }
+            70% { transform: scale(0.9) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0); }
         }
 
-        /* Range colors */
-        .ball[data-range="1"] {
-            background: linear-gradient(145deg, #ffd43b, #e67e22);
-            box-shadow: 0 4px 16px rgba(255, 212, 59, 0.35);
+        /* Ball colors - vivid & bright */
+        .b[data-range="1"] {
+            background: linear-gradient(145deg, #ffd43b, #ff9f43);
+            box-shadow: 0 5px 20px rgba(255,159,67,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
         }
-        .ball[data-range="2"] {
-            background: linear-gradient(145deg, #74b9ff, #2d6cdf);
-            box-shadow: 0 4px 16px rgba(74, 124, 255, 0.35);
+        .b[data-range="2"] {
+            background: linear-gradient(145deg, #74b9ff, #3b82f6);
+            box-shadow: 0 5px 20px rgba(59,130,246,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
         }
-        .ball[data-range="3"] {
-            background: linear-gradient(145deg, #ff7979, #c0392b);
-            box-shadow: 0 4px 16px rgba(255, 74, 106, 0.3);
+        .b[data-range="3"] {
+            background: linear-gradient(145deg, #ff7eb3, #ff3d71);
+            box-shadow: 0 5px 20px rgba(255,61,113,0.35), inset 0 2px 4px rgba(255,255,255,0.3);
         }
-        .ball[data-range="4"] {
-            background: linear-gradient(145deg, #a29bfe, #6c5ce7);
-            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.35);
+        .b[data-range="4"] {
+            background: linear-gradient(145deg, #b18cff, #8b5cf6);
+            box-shadow: 0 5px 20px rgba(139,92,246,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
         }
-        .ball[data-range="5"] {
-            background: linear-gradient(145deg, #55efc4, #00b894);
-            box-shadow: 0 4px 16px rgba(0, 184, 148, 0.35);
+        .b[data-range="5"] {
+            background: linear-gradient(145deg, #6ee7b7, #10b981);
+            box-shadow: 0 5px 20px rgba(16,185,129,0.4), inset 0 2px 4px rgba(255,255,255,0.3);
         }
 
         /* === SPONSOR === */
-        .sponsor {
-            margin-top: 14px;
-            padding: 14px;
-            background: linear-gradient(135deg, rgba(212,168,67,0.08), rgba(212,168,67,0.03));
-            border-radius: var(--radius-md);
-            border: 1px solid rgba(212,168,67,0.15);
-            text-align: center;
+        .spon {
+            flex-shrink: 0;
+            padding: 8px; text-align: center;
+            margin-bottom: 4px;
         }
-        .sponsor-title {
-            font-size: 0.7rem;
-            color: var(--gold);
+        .spon-t {
+            font-size: 0.6rem;
+            color: var(--text3);
             font-weight: 700;
-            margin-bottom: 3px;
         }
-        .sponsor-detail {
-            font-size: 0.65rem;
-            color: var(--text-muted);
+        .spon-d {
+            font-size: 0.55rem;
+            color: var(--text3);
+            opacity: 0.7;
+            margin-top: 1px;
         }
 
         /* === RESPONSIVE === */
-        @media (min-width: 540px) {
-            .shell { padding: 24px 20px; }
-            .ball { width: 48px; height: 48px; font-size: 1rem; }
-            .numbers { gap: 10px; }
+        @media (min-width: 500px) {
+            .app { padding: 0 16px; }
+            .b { width: 54px; height: 54px; font-size: 1.1rem; }
+        }
+        @media (max-width: 360px) {
+            .pk-box { height: 105px; }
+            .pk-scroll { padding: 34px 0; }
+            .pk-item { height: 34px; font-size: 0.72rem; }
+            .pk-item.active { font-size: 0.78rem; }
+            .pk-hl { height: 34px; }
+            .cat { padding: 5px 10px; font-size: 0.65rem; }
+            .b { width: 38px; height: 38px; font-size: 0.82rem; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .hdr { padding: 6px 0 3px; }
+            .hdr h1 { font-size: 1.2rem; }
+            .hdr .sub { display: none; }
+            .ctrl { padding: 6px; margin-bottom: 4px; }
+            .pk-box { height: 90px; }
+            .pk-scroll { padding: 27px 0; }
+            .gen { padding: 10px; margin-bottom: 4px; }
+            .cats { margin-bottom: 4px; }
         }
 
-        @media (max-width: 380px) {
-            .shell { padding: 10px 8px; }
-            .controls { padding: 12px; }
-            .ball { width: 36px; height: 36px; font-size: 0.78rem; }
-            .numbers { gap: 6px; }
-            .cat-tab { padding: 6px 10px; font-size: 0.68rem; }
-            .picker-container { height: 120px; }
-            .picker-scroll { padding: 41px 0; }
-        }
-
-        @media (max-height: 600px) and (orientation: landscape) {
-            .header { padding: 10px 0; }
-            .header h1 { font-size: 1.3rem; }
-            .results-scroll { max-height: 200px; }
-            .gen-btn { padding: 12px; }
-        }
-
-        @media (min-width: 768px) {
-            .results-scroll { max-height: 500px; }
-        }
-
-        /* === DARK SCROLLBAR GLOBAL === */
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: var(--text-muted) transparent;
-        }
+        * { scrollbar-width: thin; scrollbar-color: rgba(91,110,245,0.12) transparent; }
     </style>
 </head>
 <body>
 
-<div class="shell">
-    <header class="header">
+<canvas id="confetti"></canvas>
+
+<div class="app">
+    <header class="hdr">
         <h1>LOTTO ORACLE</h1>
-        <div class="subtitle">통계 기반 번호 생성기</div>
+        <div class="sub">통계 기반 번호 생성기</div>
     </header>
 
-    <!-- Category Tabs -->
-    <div class="category-bar" id="categoryBar">
-        <button class="cat-tab active" data-cat="basic">기본</button>
-        <button class="cat-tab" data-cat="frequency">빈도/간격</button>
-        <button class="cat-tab" data-cat="pattern">패턴</button>
-        <button class="cat-tab" data-cat="advanced">고급 통계</button>
-        <button class="cat-tab" data-cat="filter">필터링</button>
+    <div class="cats" id="cats">
+        <button class="cat active" data-cat="basic">기본</button>
+        <button class="cat" data-cat="frequency">빈도/간격</button>
+        <button class="cat" data-cat="pattern">패턴</button>
+        <button class="cat" data-cat="advanced">고급 통계</button>
+        <button class="cat" data-cat="filter">필터링</button>
     </div>
 
-    <!-- Controls -->
-    <div class="controls">
-        <div class="picker-row">
-            <div class="picker-wrapper">
-                <div class="picker-label">생성 방법</div>
-                <div class="picker-container">
-                    <div class="picker-highlight"></div>
-                    <div class="picker-scroll" id="methodPicker"></div>
+    <div class="ctrl">
+        <div class="pk-row">
+            <div class="pk-wrap">
+                <div class="pk-lbl">생성 방법</div>
+                <div class="pk-box">
+                    <div class="pk-hl"></div>
+                    <div class="pk-scroll" id="methodPicker"></div>
                 </div>
             </div>
-            <div class="picker-wrapper small">
-                <div class="picker-label">세트</div>
-                <div class="picker-container">
-                    <div class="picker-highlight"></div>
-                    <div class="picker-scroll" id="setCountPicker"></div>
+            <div class="pk-wrap sm">
+                <div class="pk-lbl">세트</div>
+                <div class="pk-box">
+                    <div class="pk-hl"></div>
+                    <div class="pk-scroll" id="setCountPicker"></div>
                 </div>
             </div>
         </div>
-        <div class="method-info" id="methodInfo">방법을 선택하세요</div>
+        <div class="m-desc" id="mDesc">방법을 선택하세요</div>
     </div>
 
-    <!-- Generate Button -->
-    <button class="gen-btn" id="genBtn" onclick="generate()">번호 생성</button>
+    <button class="gen" id="genBtn">번호 생성</button>
 
-    <!-- Results -->
-    <div class="results">
-        <div class="results-header">
+    <div class="res">
+        <div class="res-top">
             <span>생성 결과</span>
-            <button class="clear-btn" onclick="clearResults()">초기화</button>
+            <button class="clr-btn" id="clrBtn">초기화</button>
         </div>
-        <div class="results-scroll" id="resultsScroll">
-            <div class="result-empty" id="emptyState">
-                <div class="icon">&#x2728;</div>
-                <div>생성된 번호가 여기에 표시됩니다</div>
+        <div class="res-scroll" id="resScroll">
+            <div class="empty" id="emptyState">
+                <div class="empty-icon">&#x1F3B2;</div>
+                <div>번호를 생성해 보세요</div>
             </div>
         </div>
     </div>
 
-    <!-- Sponsor -->
-    <div class="sponsor">
-        <div class="sponsor-title">후원 계좌: 카카오뱅크 3333-35-8084358</div>
-        <div class="sponsor-detail">에듀크립트 솔루션즈</div>
+    <div class="spon">
+        <div class="spon-t">후원 계좌: 카카오뱅크 3333-35-8084358</div>
+        <div class="spon-d">에듀크립트 솔루션즈</div>
     </div>
 </div>
 
 <script>
-// ========== HISTORICAL DATA (실제 한국 로또 6/45 당첨번호) ==========
+// =============== CONFETTI ENGINE ===============
+const Confetti = (() => {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let raf = null;
+    const colors = ['#5b6ef5','#ff6b9d','#ff9a56','#2dd4a8','#38c9ff','#ffd43b','#b18cff'];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function create(count = 60) {
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: -10 - Math.random() * 40,
+                w: 4 + Math.random() * 6,
+                h: 3 + Math.random() * 4,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                vy: 2 + Math.random() * 3,
+                vx: (Math.random() - 0.5) * 3,
+                rot: Math.random() * 360,
+                rv: (Math.random() - 0.5) * 8,
+                life: 1
+            });
+        }
+        if (!raf) animate();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles = particles.filter(p => p.life > 0);
+        if (particles.length === 0) { raf = null; return; }
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.04;
+            p.rot += p.rv;
+            p.life -= 0.006;
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot * Math.PI / 180);
+            ctx.globalAlpha = Math.min(1, p.life * 2);
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+        });
+        raf = requestAnimationFrame(animate);
+    }
+
+    return { fire: create };
+})();
+
+// =============== HAPTIC & SOUND ===============
+const Haptic = {
+    light()  { try { navigator.vibrate?.(8); } catch(e){} },
+    medium() { try { navigator.vibrate?.(15); } catch(e){} },
+    heavy()  { try { navigator.vibrate?.(30); } catch(e){} },
+    tick()   { try { navigator.vibrate?.(4); } catch(e){} },
+    success(){ try { navigator.vibrate?.([12, 40, 12]); } catch(e){} }
+};
+
+const Sound = (() => {
+    let ctx = null;
+    function getCtx() {
+        if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) { return null; } }
+        if (ctx.state === 'suspended') ctx.resume();
+        return ctx;
+    }
+    function play(freq, type, dur, vol = 0.12) {
+        const c = getCtx(); if (!c) return;
+        const osc = c.createOscillator(), gain = c.createGain();
+        osc.type = type; osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol, c.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + dur);
+        osc.connect(gain); gain.connect(c.destination);
+        osc.start(c.currentTime); osc.stop(c.currentTime + dur);
+    }
+    return {
+        tick() { play(2200, 'sine', 0.03, 0.05); },
+        click() { play(1400, 'sine', 0.05, 0.07); },
+        select() { play(880, 'sine', 0.07, 0.09); setTimeout(() => play(1175, 'sine', 0.07, 0.07), 50); },
+        generate() {
+            play(523, 'sine', 0.1, 0.1);
+            setTimeout(() => play(659, 'sine', 0.1, 0.09), 70);
+            setTimeout(() => play(784, 'sine', 0.12, 0.1), 140);
+            setTimeout(() => play(1047, 'sine', 0.2, 0.12), 220);
+        },
+        ballPop(i) { setTimeout(() => play(700 + i * 130, 'sine', 0.06, 0.06), i * 55); },
+        clear() { play(500, 'triangle', 0.12, 0.06); },
+        success() { play(784, 'sine', 0.12, 0.1); setTimeout(() => play(988, 'sine', 0.12, 0.1), 90); setTimeout(() => play(1319, 'sine', 0.25, 0.12), 180); }
+    };
+})();
+
+// =============== HISTORICAL DATA ===============
 const HISTORY = [
     [3,12,18,24,30,43],[2,7,12,22,26,37],[7,11,20,30,39,43],[2,3,14,28,37,45],[6,7,14,18,29,44],
     [2,6,10,23,25,45],[3,9,17,19,43,44],[7,10,14,18,37,43],[1,4,7,15,38,45],[2,8,25,27,37,39],
@@ -558,540 +660,137 @@ const HISTORY = [
     [2,5,10,17,24,30],[7,11,22,33,39,45]
 ];
 
-// ========== STATISTICAL ENGINES ==========
+// =============== STATISTICS ===============
 const Stats = {
-    // 전체 빈도 계산
-    getFrequencies() {
-        const freq = new Array(46).fill(0);
-        HISTORY.forEach(draw => draw.forEach(n => freq[n]++));
-        return freq;
-    },
-
-    // 최근 N회차 빈도
-    getRecentFreq(n = 20) {
-        const freq = new Array(46).fill(0);
-        HISTORY.slice(0, n).forEach(draw => draw.forEach(num => freq[num]++));
-        return freq;
-    },
-
-    // 마지막 출현 간격
-    getGaps() {
-        const gaps = new Array(46).fill(HISTORY.length);
-        for (let i = 0; i < HISTORY.length; i++) {
-            HISTORY[i].forEach(n => { if (gaps[n] === HISTORY.length) gaps[n] = i; });
-        }
-        return gaps;
-    },
-
-    // 동반 출현 쌍 빈도
-    getPairFreq() {
-        const pairs = {};
-        HISTORY.forEach(draw => {
-            for (let i = 0; i < draw.length; i++) {
-                for (let j = i + 1; j < draw.length; j++) {
-                    const key = draw[i] + ',' + draw[j];
-                    pairs[key] = (pairs[key] || 0) + 1;
-                }
-            }
-        });
-        return pairs;
-    },
-
-    // 이동평균 (최근 windowSize 회차)
-    getMovingAvg(windowSize = 15) {
-        const scores = new Array(46).fill(0);
-        const recent = HISTORY.slice(0, windowSize);
-        recent.forEach((draw, i) => {
-            const weight = (windowSize - i) / windowSize;
-            draw.forEach(n => scores[n] += weight);
-        });
-        return scores;
-    },
-
-    // AC값 계산
-    calcAC(nums) {
-        const diffs = new Set();
-        for (let i = 0; i < nums.length; i++) {
-            for (let j = i + 1; j < nums.length; j++) {
-                diffs.add(Math.abs(nums[i] - nums[j]));
-            }
-        }
-        return diffs.size - (nums.length - 1);
-    },
-
-    // 엔트로피 점수 (다양성)
-    entropyScore(nums) {
-        const sorted = [...nums].sort((a, b) => a - b);
-        let score = 0;
-        // 구간 분포
-        const ranges = [0, 0, 0, 0, 0];
-        sorted.forEach(n => {
-            if (n <= 10) ranges[0]++;
-            else if (n <= 20) ranges[1]++;
-            else if (n <= 30) ranges[2]++;
-            else if (n <= 40) ranges[3]++;
-            else ranges[4]++;
-        });
-        score += ranges.filter(r => r > 0).length * 2;
-        // 홀짝 균형
-        const odds = sorted.filter(n => n % 2 === 1).length;
-        score += (3 - Math.abs(3 - odds)) * 1.5;
-        // 간격 다양성
-        for (let i = 1; i < sorted.length; i++) {
-            score += Math.min(sorted[i] - sorted[i - 1], 10) * 0.3;
-        }
-        return score;
-    },
-
-    // 패턴 검증 (배제 전략용)
-    isValidPattern(nums) {
-        const sorted = [...nums].sort((a, b) => a - b);
-        // 모두 홀수 or 모두 짝수 배제
-        const odds = sorted.filter(n => n % 2 === 1).length;
-        if (odds === 0 || odds === 6) return false;
-        // 모두 같은 10단위 배제
-        const decades = new Set(sorted.map(n => Math.floor((n - 1) / 10)));
-        if (decades.size === 1) return false;
-        // 연속 4개 이상 배제
-        let consec = 1;
-        for (let i = 1; i < sorted.length; i++) {
-            if (sorted[i] === sorted[i - 1] + 1) { consec++; if (consec >= 4) return false; }
-            else consec = 1;
-        }
-        // 합계 범위 (극단 제외)
-        const sum = sorted.reduce((a, b) => a + b, 0);
-        if (sum < 60 || sum > 220) return false;
-        return true;
-    },
-
-    // 가중 랜덤 선택
-    weightedPick(weights, count, exclude = new Set()) {
-        const result = new Set();
-        const available = [];
-        for (let i = 1; i <= 45; i++) {
-            if (!exclude.has(i) && weights[i] > 0) {
-                available.push({ num: i, weight: weights[i] });
-            }
-        }
-        while (result.size < count && available.length > 0) {
-            const total = available.reduce((s, a) => s + a.weight, 0);
-            let r = Math.random() * total;
-            for (let k = 0; k < available.length; k++) {
-                r -= available[k].weight;
-                if (r <= 0) {
-                    result.add(available[k].num);
-                    available.splice(k, 1);
-                    break;
-                }
-            }
-        }
-        // fallback
-        while (result.size < count) {
-            const n = Math.floor(Math.random() * 45) + 1;
-            if (!result.has(n)) result.add(n);
-        }
-        return [...result];
-    }
+    getFrequencies() { const f=new Array(46).fill(0); HISTORY.forEach(d=>d.forEach(n=>f[n]++)); return f; },
+    getGaps() { const g=new Array(46).fill(HISTORY.length); for(let i=0;i<HISTORY.length;i++) HISTORY[i].forEach(n=>{if(g[n]===HISTORY.length)g[n]=i;}); return g; },
+    getPairFreq() { const p={}; HISTORY.forEach(d=>{for(let i=0;i<d.length;i++)for(let j=i+1;j<d.length;j++){const k=d[i]+','+d[j];p[k]=(p[k]||0)+1;}}); return p; },
+    getMovingAvg(w=15) { const s=new Array(46).fill(0); HISTORY.slice(0,w).forEach((d,i)=>{const wt=(w-i)/w;d.forEach(n=>s[n]+=wt);}); return s; },
+    calcAC(nums) { const d=new Set(); for(let i=0;i<nums.length;i++) for(let j=i+1;j<nums.length;j++) d.add(Math.abs(nums[i]-nums[j])); return d.size-(nums.length-1); },
+    entropyScore(nums) { const s=[...nums].sort((a,b)=>a-b); let sc=0; const r=[0,0,0,0,0]; s.forEach(n=>{if(n<=10)r[0]++;else if(n<=20)r[1]++;else if(n<=30)r[2]++;else if(n<=40)r[3]++;else r[4]++;}); sc+=r.filter(x=>x>0).length*2; const od=s.filter(n=>n%2===1).length; sc+=(3-Math.abs(3-od))*1.5; for(let i=1;i<s.length;i++) sc+=Math.min(s[i]-s[i-1],10)*0.3; return sc; },
+    isValidPattern(nums) { const s=[...nums].sort((a,b)=>a-b); const od=s.filter(n=>n%2===1).length; if(od===0||od===6)return false; if(new Set(s.map(n=>Math.floor((n-1)/10))).size===1)return false; let c=1; for(let i=1;i<s.length;i++){if(s[i]===s[i-1]+1){c++;if(c>=4)return false;}else c=1;} const sm=s.reduce((a,b)=>a+b,0); return sm>=60&&sm<=220; },
+    weightedPick(weights, count) { const res=new Set(),av=[]; for(let i=1;i<=45;i++) if(weights[i]>0) av.push({num:i,weight:weights[i]}); while(res.size<count&&av.length>0){const tot=av.reduce((s,a)=>s+a.weight,0);let r=Math.random()*tot;for(let k=0;k<av.length;k++){r-=av[k].weight;if(r<=0){res.add(av[k].num);av.splice(k,1);break;}}} while(res.size<count){const n=Math.floor(Math.random()*45)+1;if(!res.has(n))res.add(n);} return[...res]; }
 };
 
-// ========== GENERATION METHODS ==========
-const generators = {
-    '90': {
-        name: '90번 방법',
-        desc: '2~90의 난수를 2로 나눈 뒤 올림하여 1~45 번호를 생성합니다.',
-        fn() {
-            const nums = new Set();
-            while (nums.size < 6) {
-                const n = Math.floor(Math.random() * 89) + 2;
-                nums.add(Math.ceil(n / 2));
-            }
-            return [...nums];
-        }
-    },
-    random: {
-        name: '랜덤',
-        desc: '1~45에서 6개를 완전 무작위로 선택합니다.',
-        fn() {
-            const nums = new Set();
-            while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-            return [...nums];
-        }
-    },
-    oddeven: {
-        name: '홀짝 균형',
-        desc: '홀수 3개, 짝수 3개를 균등하게 선택합니다. 역대 가장 빈출 비율입니다.',
-        fn() {
-            const odds = new Set(), evens = new Set();
-            while (odds.size < 3) { const n = Math.floor(Math.random() * 23) * 2 + 1; if (n <= 45) odds.add(n); }
-            while (evens.size < 3) { evens.add(Math.floor(Math.random() * 22) * 2 + 2); }
-            return [...odds, ...evens];
-        }
-    },
-    highlow: {
-        name: '고저 균형',
-        desc: '저번호(1~22) 3개, 고번호(23~45) 3개를 균등하게 선택합니다.',
-        fn() {
-            const lows = new Set(), highs = new Set();
-            while (lows.size < 3) lows.add(Math.floor(Math.random() * 22) + 1);
-            while (highs.size < 3) highs.add(Math.floor(Math.random() * 23) + 23);
-            return [...lows, ...highs];
-        }
-    },
-    section: {
-        name: '번호대 분산',
-        desc: '1~9, 10~19, 20~29, 30~39, 40~45 각 구간에서 1개씩 + 랜덤 1개를 뽑습니다.',
-        fn() {
-            const sections = [[1,9],[10,19],[20,29],[30,39],[40,45]];
-            const used = new Set();
-            const nums = [];
-            sections.forEach(([min, max]) => {
-                let n;
-                do { n = Math.floor(Math.random() * (max - min + 1)) + min; } while (used.has(n));
-                used.add(n); nums.push(n);
-            });
-            let extra;
-            do { extra = Math.floor(Math.random() * 45) + 1; } while (used.has(extra));
-            nums.push(extra);
-            return nums;
-        }
-    },
-    frequency: {
-        name: '빈도 분석',
-        desc: '역대 당첨 데이터에서 자주 출현한 번호(핫 넘버)에 가중치를 두어 선택합니다.',
-        fn() {
-            const freq = Stats.getFrequencies();
-            return Stats.weightedPick(freq, 6);
-        }
-    },
-    gap: {
-        name: '간격 분석',
-        desc: '오랫동안 출현하지 않은 번호(콜드 넘버)를 우선 선택합니다. 회귀 기대 전략.',
-        fn() {
-            const gaps = Stats.getGaps();
-            const weights = new Array(46).fill(0);
-            for (let i = 1; i <= 45; i++) weights[i] = gaps[i] + 1;
-            return Stats.weightedPick(weights, 6);
-        }
-    },
-    association: {
-        name: '연관 규칙',
-        desc: '역대 데이터에서 자주 함께 출현한 번호 쌍을 기반으로 조합을 구성합니다.',
-        fn() {
-            const pairs = Stats.getPairFreq();
-            const sorted = Object.entries(pairs).sort((a, b) => b[1] - a[1]);
-            const result = new Set();
-            for (const [key] of sorted) {
-                if (result.size >= 6) break;
-                const [a, b] = key.split(',').map(Number);
-                if (result.size < 5) { result.add(a); result.add(b); }
-                else if (result.size === 5) { if (!result.has(a)) result.add(a); else if (!result.has(b)) result.add(b); }
-            }
-            while (result.size < 6) result.add(Math.floor(Math.random() * 45) + 1);
-            return [...result].slice(0, 6);
-        }
-    },
-    poisson: {
-        name: '확률 분포',
-        desc: '포아송 분포 기반으로 기대값 대비 출현이 적은(과소 출현) 번호를 선택합니다.',
-        fn() {
-            const freq = Stats.getFrequencies();
-            const total = HISTORY.length;
-            const expected = total * 6 / 45;
-            const weights = new Array(46).fill(0);
-            for (let i = 1; i <= 45; i++) {
-                const deviation = expected - freq[i];
-                weights[i] = Math.max(0.1, deviation + expected);
-            }
-            return Stats.weightedPick(weights, 6);
-        }
-    },
-    movingavg: {
-        name: '이동평균',
-        desc: '최근 15회차의 가중 이동평균을 계산하여 상승 추세인 번호를 선택합니다.',
-        fn() {
-            const recent = Stats.getMovingAvg(15);
-            const older = Stats.getMovingAvg(30);
-            const trend = new Array(46).fill(0);
-            for (let i = 1; i <= 45; i++) {
-                trend[i] = Math.max(0.1, recent[i] * 2 - older[i] + 1);
-            }
-            return Stats.weightedPick(trend, 6);
-        }
-    },
-    sumrange: {
-        name: '합계 범위',
-        desc: '당첨번호 합계의 최빈 구간(100~175)에 맞는 조합만 선택합니다.',
-        fn() {
-            let attempts = 0;
-            while (attempts < 5000) {
-                attempts++;
-                const nums = new Set();
-                while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-                const arr = [...nums];
-                const sum = arr.reduce((a, b) => a + b, 0);
-                if (sum >= 100 && sum <= 175) return arr;
-            }
-            const nums = new Set();
-            while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-            return [...nums];
-        }
-    },
-    montecarlo: {
-        name: '몬테카를로',
-        desc: '10,000회 시뮬레이션을 돌려 역대 분포 패턴과 가장 유사한 조합을 선택합니다.',
-        fn() {
-            const freq = Stats.getFrequencies();
-            const totalNums = HISTORY.length * 6;
-            const idealDist = freq.map(f => f / totalNums);
-            let bestSet = null, bestScore = Infinity;
-
-            for (let trial = 0; trial < 10000; trial++) {
-                const nums = new Set();
-                while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-                const arr = [...nums];
-                let score = 0;
-                arr.forEach(n => { score += Math.abs(idealDist[n] - (1 / 45)); });
-                // 부가 점수: AC값, 합계 범위, 홀짝
-                const sum = arr.reduce((a, b) => a + b, 0);
-                if (sum < 100 || sum > 175) score += 0.5;
-                const ac = Stats.calcAC(arr);
-                if (ac < 7 || ac > 10) score += 0.3;
-                if (score < bestScore) { bestScore = score; bestSet = arr; }
-            }
-            return bestSet || generators.random.fn();
-        }
-    },
-    entropy: {
-        name: '엔트로피 기반',
-        desc: '정보 엔트로피(다양성)를 최대화하는 조합을 선택합니다. 편중 없는 분산 전략.',
-        fn() {
-            let bestSet = null, bestScore = -Infinity;
-            for (let trial = 0; trial < 5000; trial++) {
-                const nums = new Set();
-                while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-                const arr = [...nums];
-                const score = Stats.entropyScore(arr);
-                if (score > bestScore) { bestScore = score; bestSet = arr; }
-            }
-            return bestSet || generators.random.fn();
-        }
-    },
-    elimination: {
-        name: '배제 전략',
-        desc: '통계적으로 비현실적인 패턴(올홀, 올짝, 연속4+, 극단합 등)을 배제합니다.',
-        fn() {
-            let attempts = 0;
-            while (attempts < 10000) {
-                attempts++;
-                const nums = new Set();
-                while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-                const arr = [...nums];
-                if (Stats.isValidPattern(arr)) return arr;
-            }
-            return generators.random.fn();
-        }
-    },
-    acvalue: {
-        name: 'AC값 최적화',
-        desc: 'AC값(산술복잡도) 7~10 범위의 조합만 선택합니다. 역대 당첨의 80%가 이 범위.',
-        fn() {
-            let attempts = 0;
-            while (attempts < 10000) {
-                attempts++;
-                const nums = new Set();
-                while (nums.size < 6) nums.add(Math.floor(Math.random() * 45) + 1);
-                const arr = [...nums].sort((a, b) => a - b);
-                const ac = Stats.calcAC(arr);
-                if (ac >= 7 && ac <= 10 && Stats.isValidPattern(arr)) return arr;
-            }
-            return generators.random.fn();
-        }
-    }
+// =============== GENERATORS ===============
+const G = {
+    '90':{name:'90번 방법',desc:'2~90 난수를 2로 나눈 뒤 올림하여 번호를 생성합니다.',fn(){const s=new Set();while(s.size<6){s.add(Math.ceil((Math.floor(Math.random()*89)+2)/2));}return[...s];}},
+    random:{name:'랜덤',desc:'1~45에서 완전 무작위로 6개를 선택합니다.',fn(){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);return[...s];}},
+    oddeven:{name:'홀짝 균형',desc:'홀수 3개 + 짝수 3개. 역대 가장 빈출하는 비율입니다.',fn(){const o=new Set(),e=new Set();while(o.size<3){const n=Math.floor(Math.random()*23)*2+1;if(n<=45)o.add(n);}while(e.size<3)e.add(Math.floor(Math.random()*22)*2+2);return[...o,...e];}},
+    highlow:{name:'고저 균형',desc:'저번호(1~22) 3개 + 고번호(23~45) 3개를 선택합니다.',fn(){const l=new Set(),h=new Set();while(l.size<3)l.add(Math.floor(Math.random()*22)+1);while(h.size<3)h.add(Math.floor(Math.random()*23)+23);return[...l,...h];}},
+    section:{name:'번호대 분산',desc:'각 구간(1~9,10~19,20~29,30~39,40~45)에서 1개씩 + 랜덤 1개.',fn(){const sec=[[1,9],[10,19],[20,29],[30,39],[40,45]],u=new Set(),n=[];sec.forEach(([a,b])=>{let v;do{v=Math.floor(Math.random()*(b-a+1))+a;}while(u.has(v));u.add(v);n.push(v);});let x;do{x=Math.floor(Math.random()*45)+1;}while(u.has(x));n.push(x);return n;}},
+    frequency:{name:'빈도 분석',desc:'역대 당첨에서 자주 출현한 핫 넘버에 가중치를 둡니다.',fn(){return Stats.weightedPick(Stats.getFrequencies(),6);}},
+    gap:{name:'간격 분석',desc:'오랫동안 출현하지 않은 콜드 넘버를 우선 선택합니다.',fn(){const g=Stats.getGaps(),w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=g[i]+1;return Stats.weightedPick(w,6);}},
+    association:{name:'연관 규칙',desc:'자주 함께 출현하는 번호 쌍을 기반으로 조합을 구성합니다.',fn(){const p=Stats.getPairFreq(),s=Object.entries(p).sort((a,b)=>b[1]-a[1]),r=new Set();for(const[k]of s){if(r.size>=6)break;const[a,b]=k.split(',').map(Number);if(r.size<5){r.add(a);r.add(b);}else if(!r.has(a))r.add(a);else if(!r.has(b))r.add(b);}while(r.size<6)r.add(Math.floor(Math.random()*45)+1);return[...r].slice(0,6);}},
+    poisson:{name:'확률 분포',desc:'포아송 분포 기반으로 과소 출현 번호를 우선 선택합니다.',fn(){const f=Stats.getFrequencies(),ex=HISTORY.length*6/45,w=new Array(46).fill(0);for(let i=1;i<=45;i++)w[i]=Math.max(0.1,ex-f[i]+ex);return Stats.weightedPick(w,6);}},
+    movingavg:{name:'이동평균',desc:'최근 15회차 가중 이동평균으로 상승 추세 번호를 선택합니다.',fn(){const r=Stats.getMovingAvg(15),o=Stats.getMovingAvg(30),t=new Array(46).fill(0);for(let i=1;i<=45;i++)t[i]=Math.max(0.1,r[i]*2-o[i]+1);return Stats.weightedPick(t,6);}},
+    sumrange:{name:'합계 범위',desc:'합계가 최빈 구간(100~175)에 해당하는 조합만 선택합니다.',fn(){for(let a=0;a<5000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s];if(arr.reduce((a,b)=>a+b,0)>=100&&arr.reduce((a,b)=>a+b,0)<=175)return arr;}return G.random.fn();}},
+    montecarlo:{name:'몬테카를로',desc:'10,000회 시뮬레이션으로 역대 분포와 가장 유사한 조합을 선택합니다.',fn(){const f=Stats.getFrequencies(),tot=HISTORY.length*6,id=f.map(v=>v/tot);let best=null,bs=Infinity;for(let t=0;t<10000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s];let sc=0;a.forEach(n=>sc+=Math.abs(id[n]-1/45));const sm=a.reduce((x,y)=>x+y,0);if(sm<100||sm>175)sc+=0.5;const ac=Stats.calcAC(a);if(ac<7||ac>10)sc+=0.3;if(sc<bs){bs=sc;best=a;}}return best||G.random.fn();}},
+    entropy:{name:'엔트로피 기반',desc:'정보 엔트로피(다양성)를 최대화하는 분산 전략입니다.',fn(){let best=null,bs=-Infinity;for(let t=0;t<5000;t++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const a=[...s],sc=Stats.entropyScore(a);if(sc>bs){bs=sc;best=a;}}return best||G.random.fn();}},
+    elimination:{name:'배제 전략',desc:'올홀, 올짝, 연속4+, 극단합 등 비현실 패턴을 배제합니다.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);if(Stats.isValidPattern([...s]))return[...s];}return G.random.fn();}},
+    acvalue:{name:'AC값 최적화',desc:'AC값 7~10 범위 조합만 선택. 역대 당첨의 80%가 이 범위입니다.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s].sort((a,b)=>a-b);if(Stats.calcAC(arr)>=7&&Stats.calcAC(arr)<=10&&Stats.isValidPattern(arr))return arr;}return G.random.fn();}}
 };
 
-// ========== CATEGORY -> METHOD MAPPING ==========
-const categories = {
-    basic: ['90', 'random', 'oddeven', 'highlow', 'section'],
-    frequency: ['frequency', 'gap', 'movingavg'],
-    pattern: ['association', 'oddeven', 'section'],
-    advanced: ['poisson', 'montecarlo', 'entropy', 'acvalue'],
-    filter: ['sumrange', 'elimination', 'acvalue']
+// =============== CATEGORIES ===============
+const CATS = {
+    basic:['90','random','oddeven','highlow','section'],
+    frequency:['frequency','gap','movingavg'],
+    pattern:['association','oddeven','section'],
+    advanced:['poisson','montecarlo','entropy','acvalue'],
+    filter:['sumrange','elimination','acvalue']
 };
 
-let currentCategory = 'basic';
-let selectedMethod = '90';
-let selectedSetCount = 4;
-let methodPickerInstance = null;
+let curCat='basic', selMethod='90', selSets=4;
 
-// ========== CATEGORY TAB LOGIC ==========
-document.querySelectorAll('.cat-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+// =============== PICKER ===============
+function createPicker(id, opts, defIdx, onSelect) {
+    const el=document.getElementById(id);
+    const ih=36, cnt=opts.length, cl=Math.min(3,cnt);
+    let val=opts[defIdx].value, scrolling=false, lastVal=null;
+    el.innerHTML='';
+    const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;d.style.height=ih+'px';return d;};
+    for(let i=cnt-cl;i<cnt;i++) el.appendChild(mk(opts[i],i,true));
+    opts.forEach((o,i)=>el.appendChild(mk(o,i,false)));
+    for(let i=0;i<cl;i++) el.appendChild(mk(opts[i],i,true));
+    const items=el.querySelectorAll('.pk-item');
+    function updateActive(){const ci=Math.round(el.scrollTop/ih);items.forEach((it,idx)=>{if(idx===ci){it.classList.add('active');val=it.dataset.value;if(val!==lastVal){lastVal=val;Haptic.tick();Sound.tick();onSelect(val);}}else it.classList.remove('active');});}
+    function handleScroll(){if(scrolling)return;const st=el.scrollTop;if(st<(cl-1)*ih){scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50);}else if(st>(cl+cnt-1)*ih){scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50);}updateActive();}
+    el.addEventListener('scroll',handleScroll);
+    items.forEach(it=>{it.addEventListener('click',()=>{Haptic.light();Sound.click();el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'});});});
+    el.style.padding=Math.floor((el.parentElement.clientHeight-ih)/2)+'px 0';
+    setTimeout(()=>{el.scrollTop=(cl+defIdx)*ih;updateActive();},60);
+    return()=>val;
+}
+
+// =============== CATEGORY TABS ===============
+document.querySelectorAll('.cat').forEach(tab=>{
+    tab.addEventListener('click',()=>{
+        Haptic.medium(); Sound.select();
+        document.querySelectorAll('.cat').forEach(t=>t.classList.remove('active'));
         tab.classList.add('active');
-        currentCategory = tab.dataset.cat;
-        rebuildMethodPicker();
+        curCat=tab.dataset.cat;
+        rebuildMethod();
     });
 });
+function rebuildMethod(){const keys=CATS[curCat],opts=keys.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc();});}
+function updateDesc(){const d=document.getElementById('mDesc');if(G[selMethod])d.textContent=G[selMethod].desc;}
 
-function rebuildMethodPicker() {
-    const keys = categories[currentCategory];
-    const options = keys.map(k => ({ value: k, label: generators[k].name }));
-    selectedMethod = options[0].value;
-    updateMethodInfo();
-    createCircularPicker('methodPicker', options, 0, val => {
-        selectedMethod = val;
-        updateMethodInfo();
-    });
-}
+const setCounts=[];
+for(let i=1;i<=10;i++) setCounts.push({value:i,label:i+'세트'});
+createPicker('setCountPicker',setCounts,3,v=>selSets=parseInt(v));
+rebuildMethod();
 
-function updateMethodInfo() {
-    const info = document.getElementById('methodInfo');
-    const gen = generators[selectedMethod];
-    if (gen) info.textContent = gen.desc;
-}
+// =============== GENERATE ===============
+const genBtn=document.getElementById('genBtn');
+genBtn.addEventListener('click',generate);
 
-// ========== CIRCULAR PICKER ==========
-function createCircularPicker(elementId, options, defaultIndex, onSelect) {
-    const picker = document.getElementById(elementId);
-    const itemHeight = 38;
-    const itemCount = options.length;
-    const cloneCount = Math.min(3, itemCount);
-    let selectedValue = options[defaultIndex].value;
-    let isScrolling = false;
+function generate(){
+    const gen=G[selMethod]; if(!gen) return;
+    Sound.generate(); Haptic.heavy();
 
-    picker.innerHTML = '';
+    const emp=document.getElementById('emptyState'); if(emp) emp.remove();
+    const container=document.getElementById('resScroll');
+    const range=n=>n<=10?'1':n<=20?'2':n<=30?'3':n<=40?'4':'5';
 
-    for (let i = itemCount - cloneCount; i < itemCount; i++) {
-        const div = document.createElement('div');
-        div.className = 'picker-item clone';
-        div.dataset.value = options[i].value;
-        div.dataset.realIndex = i;
-        div.textContent = options[i].label;
-        picker.appendChild(div);
-    }
-    options.forEach((opt, i) => {
-        const div = document.createElement('div');
-        div.className = 'picker-item';
-        div.dataset.value = opt.value;
-        div.dataset.realIndex = i;
-        div.textContent = opt.label;
-        picker.appendChild(div);
-    });
-    for (let i = 0; i < cloneCount; i++) {
-        const div = document.createElement('div');
-        div.className = 'picker-item clone';
-        div.dataset.value = options[i].value;
-        div.dataset.realIndex = i;
-        div.textContent = options[i].label;
-        picker.appendChild(div);
-    }
-
-    const items = picker.querySelectorAll('.picker-item');
-
-    function updateActive() {
-        const scrollTop = picker.scrollTop;
-        const centerIndex = Math.round(scrollTop / itemHeight);
-        items.forEach((item, index) => {
-            if (index === centerIndex) {
-                item.classList.add('active');
-                selectedValue = item.dataset.value;
-                onSelect(selectedValue);
-            } else {
-                item.classList.remove('active');
-            }
-        });
-    }
-
-    function handleScroll() {
-        if (isScrolling) return;
-        const scrollTop = picker.scrollTop;
-        if (scrollTop < (cloneCount - 1) * itemHeight) {
-            isScrolling = true;
-            picker.scrollTop = scrollTop + itemCount * itemHeight;
-            setTimeout(() => isScrolling = false, 50);
-        } else if (scrollTop > (cloneCount + itemCount - 1) * itemHeight) {
-            isScrolling = true;
-            picker.scrollTop = scrollTop - itemCount * itemHeight;
-            setTimeout(() => isScrolling = false, 50);
-        }
-        updateActive();
-    }
-
-    picker.addEventListener('scroll', handleScroll);
-    items.forEach(item => {
-        item.addEventListener('click', () => {
-            const realIndex = parseInt(item.dataset.realIndex);
-            picker.scrollTo({ top: (cloneCount + realIndex) * itemHeight, behavior: 'smooth' });
-        });
-    });
-
-    setTimeout(() => {
-        picker.scrollTop = (cloneCount + defaultIndex) * itemHeight;
-        updateActive();
-    }, 50);
-
-    return () => selectedValue;
-}
-
-// ========== SET COUNT PICKER ==========
-const setCounts = [];
-for (let i = 1; i <= 10; i++) setCounts.push({ value: i, label: i + '세트' });
-createCircularPicker('setCountPicker', setCounts, 3, val => selectedSetCount = parseInt(val));
-
-// ========== INIT METHOD PICKER ==========
-rebuildMethodPicker();
-
-// ========== GENERATE ==========
-function generate() {
-    const gen = generators[selectedMethod];
-    if (!gen) return;
-
-    const emptyState = document.getElementById('emptyState');
-    if (emptyState) emptyState.remove();
-
-    const container = document.getElementById('resultsScroll');
-    const getRange = n => { if (n <= 10) return '1'; if (n <= 20) return '2'; if (n <= 30) return '3'; if (n <= 40) return '4'; return '5'; };
-
-    for (let set = 1; set <= selectedSetCount; set++) {
-        const nums = gen.fn().sort((a, b) => a - b);
-        const setEl = document.createElement('div');
-        setEl.className = 'set';
-        setEl.style.animationDelay = (set - 1) * 0.08 + 's';
-
-        setEl.innerHTML = `
-            <div class="set-header">
-                <strong>${set}세트</strong>
-                <span class="method-tag">${gen.name}</span>
+    for(let s=1;s<=selSets;s++){
+        const nums=gen.fn().sort((a,b)=>a-b);
+        const el=document.createElement('div');
+        el.className='set';
+        el.style.animationDelay=(s-1)*0.08+'s';
+        el.innerHTML=`
+            <div class="set-top">
+                <strong>${s}세트</strong>
+                <span class="tag">${gen.name}</span>
             </div>
-            <div class="numbers">
-                ${nums.map((n, i) => `<span class="ball" data-range="${getRange(n)}" style="animation-delay:${(set - 1) * 0.08 + i * 0.06}s">${n}</span>`).join('')}
-            </div>
-        `;
-        container.insertBefore(setEl, container.firstChild);
+            <div class="balls">
+                ${nums.map((n,i)=>`<span class="b" data-range="${range(n)}" style="animation-delay:${(s-1)*0.08+i*0.07}s">${n}</span>`).join('')}
+            </div>`;
+        container.insertBefore(el,container.firstChild);
+        nums.forEach((_,i)=>Sound.ballPop(i+(s-1)*6));
     }
+    container.scrollTop=0;
 
-    // Scroll to top
-    container.scrollTop = 0;
+    // Confetti!
+    Confetti.fire(50 + selSets * 10);
 
-    // Button feedback
-    const btn = document.getElementById('genBtn');
-    btn.textContent = '생성 완료!';
-    btn.style.background = 'linear-gradient(135deg, var(--accent-green), #1a8a4a)';
-    setTimeout(() => {
-        btn.textContent = '번호 생성';
-        btn.style.background = '';
-    }, 800);
+    genBtn.textContent='생성 완료!';
+    genBtn.classList.add('done','shimmer');
+    setTimeout(()=>Sound.success(),300);
+    setTimeout(()=>Haptic.success(),300);
+    setTimeout(()=>{genBtn.textContent='번호 생성';genBtn.classList.remove('done','shimmer');},900);
 }
 
-function clearResults() {
-    const container = document.getElementById('resultsScroll');
-    container.innerHTML = `
-        <div class="result-empty" id="emptyState">
-            <div class="icon">&#x2728;</div>
-            <div>생성된 번호가 여기에 표시됩니다</div>
-        </div>
-    `;
-}
+// =============== CLEAR ===============
+document.getElementById('clrBtn').addEventListener('click',()=>{
+    Haptic.light(); Sound.clear();
+    document.getElementById('resScroll').innerHTML=`<div class="empty" id="emptyState"><div class="empty-icon">&#x1F3B2;</div><div>번호를 생성해 보세요</div></div>`;
+});
+
+// =============== INIT AUDIO ON FIRST TOUCH ===============
+document.addEventListener('touchstart',function init(){
+    try{const c=new(window.AudioContext||window.webkitAudioContext)(),b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);s.start(0);}catch(e){}
+    document.removeEventListener('touchstart',init);
+},{once:true});
 </script>
 </body>
 </html>
