@@ -34,15 +34,14 @@
             position:relative;z-index:1;
             height:100%;height:100dvh;
             display:flex;flex-direction:column;
-            max-width:560px;margin:0 auto;
-            padding:0 8px;
+            max-width:100%;margin:0 auto;
+            padding:0;
             padding-bottom:env(safe-area-inset-bottom,0);
         }
-        .sp-top{flex:0}
-        .sp-bot{flex:0 0 8px}
+        .sp-bot{flex:1;min-height:8px}
 
         /* ===== HEADER ===== */
-        .hdr{text-align:center;padding:18px 0 6px;flex-shrink:0}
+        .hdr{text-align:center;padding:14px 10px 4px;flex-shrink:0}
         .hdr h1{
             font-family:'Black Han Sans',sans-serif;
             font-size:clamp(2rem,8vw,2.8rem);
@@ -58,7 +57,7 @@
         .cats{
             display:flex;gap:7px;flex-shrink:0;
             overflow-x:auto;scrollbar-width:none;
-            padding:6px 0;
+            padding:6px 10px;
         }
         .cats::-webkit-scrollbar{display:none}
         .cat{
@@ -81,20 +80,19 @@
 
         /* ===== CONTROLS ===== */
         .ctrl{
-            flex:1 1 auto;min-height:160px;
-            display:flex;flex-direction:column;
+            flex-shrink:0;
             background:var(--card);
-            border-radius:20px;padding:16px 14px;
+            border-radius:14px;padding:12px 10px;
             box-shadow:0 4px 20px rgba(91,110,245,.1);
-            margin:8px 0;border:1px solid var(--border);
+            margin:8px 6px;border:1px solid var(--border);
         }
-        .pk-row{display:flex;gap:10px;flex:1;min-height:0}
-        .pk-wrap{flex:1;min-width:0;display:flex;flex-direction:column}
-        .pk-wrap.sm{flex:0 0 90px;display:flex;flex-direction:column}
-        .pk-lbl{font-size:.8rem;color:var(--t3);margin-bottom:5px;font-weight:600;padding-left:4px;letter-spacing:1px;flex-shrink:0}
+        .pk-row{display:flex;gap:8px}
+        .pk-wrap{flex:1;min-width:0}
+        .pk-wrap.sm{flex:0 0 80px}
+        .pk-lbl{font-size:.8rem;color:var(--t3);margin-bottom:4px;font-weight:600;padding-left:4px;letter-spacing:1px}
         .pk-box{
-            position:relative;flex:1;min-height:120px;overflow:hidden;
-            background:var(--surface);border-radius:14px;border:1px solid var(--border);
+            position:relative;height:clamp(160px,28vh,300px);overflow:hidden;
+            background:var(--surface);border-radius:12px;border:1px solid var(--border);
         }
         .pk-hl{
             position:absolute;top:50%;left:5px;right:5px;
@@ -112,8 +110,7 @@
         }
         .pk-item.active{color:var(--pri);font-weight:800;font-size:1.1rem}
         .m-desc{
-            flex-shrink:0;
-            margin-top:10px;padding:10px 14px;
+            margin-top:8px;padding:8px 12px;
             background:var(--pri-pale);border-radius:10px;
             border-left:3px solid var(--pri);
             font-size:.85rem;color:var(--t2);line-height:1.5;
@@ -121,8 +118,8 @@
 
         /* ===== GENERATE BUTTON ===== */
         .gen{
-            flex-shrink:0;display:block;width:100%;
-            padding:18px;margin:8px 0;border:none;border-radius:16px;
+            flex-shrink:0;display:block;width:calc(100% - 12px);
+            padding:18px;margin:8px 6px;border:none;border-radius:14px;
             background:linear-gradient(135deg,var(--pri),var(--pri-lt),var(--cyan));
             background-size:200% 200%;color:#fff;
             font-family:'Black Han Sans',sans-serif;
@@ -148,7 +145,7 @@
         }
         .res.empty{max-height:0;opacity:0;margin:0}
         .res.has-results{
-            max-height:45vh;opacity:1;margin:0 0 6px;
+            max-height:45vh;opacity:1;margin:0 6px 6px;
             background:var(--card);
             box-shadow:0 4px 20px rgba(91,110,245,.1);
             border:1px solid var(--border);
@@ -211,25 +208,25 @@
         .b[data-range="5"]{background:linear-gradient(145deg,#6ee7b7,#10b981);box-shadow:0 5px 20px rgba(16,185,129,.4),inset 0 2px 4px rgba(255,255,255,.3)}
 
         /* ===== SPONSOR ===== */
-        .spon{flex-shrink:0;padding:8px;text-align:center}
+        .spon{flex-shrink:0;padding:10px;text-align:center}
         .spon-t{font-size:.75rem;color:var(--t3);font-weight:700}
         .spon-d{font-size:.68rem;color:var(--t3);opacity:.7;margin-top:1px}
 
         /* ===== RESPONSIVE ===== */
-        @media (min-width:500px){.b{width:56px;height:56px;font-size:1.2rem}}
+        @media (min-width:500px){.app{max-width:560px;margin:0 auto;padding:0 8px}.b{width:56px;height:56px;font-size:1.2rem}}
         @media (max-width:360px){
             .hdr h1{font-size:1.8rem}
             .cat{padding:8px 13px;font-size:.82rem}
-            .pk-box{min-height:80px}
+            .pk-box{height:clamp(120px,25vh,200px)}
             .pk-item{height:40px;font-size:.9rem}.pk-item.active{font-size:1rem}.pk-hl{height:40px}
             .b{width:40px;height:40px;font-size:.95rem}.balls{gap:6px}
             .m-desc{font-size:.78rem}
         }
         @media (max-height:600px) and (orientation:landscape){
-            .hdr{padding:4px 0 2px}.hdr h1{font-size:1.3rem}.hdr .sub{display:none}
+            .hdr{padding:4px 6px 2px}.hdr h1{font-size:1.3rem}.hdr .sub{display:none}
             .sp-bot{flex:.2}
-            .ctrl{padding:8px;margin:4px 0;min-height:80px}.pk-box{min-height:60px}.pk-item{height:36px}.pk-hl{height:36px}
-            .gen{padding:12px;margin:4px 0}
+            .ctrl{padding:8px;margin:4px 6px}.pk-box{height:90px}.pk-item{height:36px}.pk-hl{height:36px}
+            .gen{padding:12px;margin:4px 6px}
             .res.has-results{max-height:30vh}
         }
         *{scrollbar-width:thin;scrollbar-color:rgba(91,110,245,.12) transparent}
@@ -238,8 +235,6 @@
 <body>
 <canvas id="confetti"></canvas>
 <div class="app">
-    <div class="sp-top"></div>
-
     <header class="hdr">
         <h1>LOTTO ORACLE</h1>
         <div class="sub">통계 기반 번호 생성기</div>
