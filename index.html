@@ -67,15 +67,16 @@
             font-family:'Noto Sans KR',sans-serif;
             cursor:pointer;white-space:nowrap;
             transition:all .25s cubic-bezier(.34,1.56,.64,1);
-            box-shadow:0 3px 10px rgba(91,110,245,.1);
+            box-shadow:0 8px 0 rgba(0,0,0,.05), 0 15px 20px rgba(0,0,0,.1);
+            position:relative;top:0;
         }
         .cat.active{
             background:linear-gradient(135deg,var(--pri),var(--pri-lt));
             color:#fff;border-color:transparent;
-            box-shadow:0 6px 22px rgba(91,110,245,.35);
-            transform:scale(1.05);
+            box-shadow:0 10px 0 #3f4fb5, 0 20px 35px rgba(91,110,245,.4);
+            transform:translateY(-4px);
         }
-        .cat:active{transform:scale(.95)}
+        .cat:active{transform:translateY(6px);box-shadow:0 4px 0 #3f4fb5, 0 8px 15px rgba(0,0,0,.2)}
 
         /* ===== CONTROLS ===== */
         .ctrl{
@@ -92,27 +93,43 @@
         .pk-box{
             position:relative;height:400px;overflow:hidden;
             background:var(--surface);border-radius:20px;border:1px solid var(--border);
+            perspective:1500px;
         }
         .pk-hl{
             position:absolute;top:50%;left:8px;right:8px;
             height:80px;transform:translateY(-50%);
-            background:linear-gradient(90deg,var(--pri-pale),rgba(91,110,245,.04));
+            background:linear-gradient(90deg,rgba(91,110,245,.15),rgba(91,110,245,.03));
             border-radius:18px;pointer-events:none;
-            border:2px solid rgba(91,110,245,.2);
+            border:3.5px solid rgba(91,110,245,.4);
+            box-shadow:0 0 40px rgba(91,110,245,.15);
+            z-index:10;
         }
-        .pk-scroll{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+        .pk-scroll{
+            height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;
+            -webkit-overflow-scrolling:touch;transform-style:preserve-3d;
+        }
         .pk-scroll::-webkit-scrollbar{display:none}
         .pk-item{
             height:80px;display:flex;align-items:center;justify-content:center;
             scroll-snap-align:center;font-size:2.1rem;color:var(--t3);
-            transition:all .15s ease;cursor:pointer;padding:0 6px;
+            transition:all .25s ease;cursor:pointer;padding:0 6px;
+            backface-visibility:hidden;
         }
-        .pk-item.active{color:var(--pri);font-weight:800;font-size:2.7rem}
-        .m-desc{
-            margin-top:20px;padding:20px 25px;
-            background:var(--pri-pale);border-radius:18px;
-            border-left:8px solid var(--pri);
-            font-size:1.8rem;color:var(--t2);line-height:1.5;
+        .pk-item.active{color:var(--pri);font-weight:800;font-size:2.7rem;transform:scale(1.15) translateZ(80px)}
+        .m-desc-container{
+            margin-top:20px;background:var(--pri-pale);border-radius:18px;
+            border-left:10px solid var(--pri);overflow:hidden;padding:25px 0;
+            box-shadow:inset 0 2px 10px rgba(0,0,0,.05);
+        }
+        .m-marquee{
+            display:inline-block;white-space:nowrap;
+            padding-left:100%;
+            animation:marquee-lr 30s linear infinite;
+            font-size:2.7rem;color:var(--t2);font-weight:700;
+        }
+        @keyframes marquee-lr{
+            0%{transform:translateX(-100%)}
+            100%{transform:translateX(0%)}
         }
 
         /* ===== GENERATE BUTTON ===== */
@@ -124,15 +141,19 @@
             font-family:'Black Han Sans',sans-serif;
             font-size:clamp(2.4rem,11vw,3.5rem);letter-spacing:12px;
             cursor:pointer;position:relative;overflow:hidden;
-            box-shadow:0 10px 40px rgba(91,110,245,.4);
-            animation:pulse 3s ease-in-out infinite;transition:all .2s ease;
+            box-shadow:0 15px 0 #3f4fb5, 0 25px 40px rgba(91,110,245,.4);
+            animation:pulse 3s ease-in-out infinite;transition:all .15s cubic-bezier(.34,1.56,.64,1);
+            top:0;
         }
         @keyframes pulse{
-            0%,100%{background-position:0% 50%;box-shadow:0 6px 28px rgba(91,110,245,.35)}
-            50%{background-position:100% 50%;box-shadow:0 6px 34px rgba(56,201,255,.35)}
+            0%,100%{background-position:0% 50%;box-shadow:0 15px 0 #3f4fb5, 0 25px 40px rgba(91,110,245,.4)}
+            50%{background-position:100% 50%;box-shadow:0 15px 0 #3f4fb5, 0 25px 45px rgba(56,201,255,.4)}
         }
         .gen::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s ease}
-        .gen:active{transform:scale(.96);box-shadow:0 3px 14px rgba(91,110,245,.3)}
+        .gen:active{
+            top:10px;box-shadow:0 5px 0 #3f4fb5, 0 10px 20px rgba(0,0,0,.2);
+            transform:scale(.97);
+        }
         .gen.done{background:linear-gradient(135deg,var(--green),#1ad4a0)!important;box-shadow:0 6px 28px rgba(45,212,168,.4)!important;animation:none}
         .gen.shimmer::before{left:100%}
 
@@ -261,7 +282,9 @@
                 </div>
             </div>
         </div>
-        <div class="m-desc" id="mDesc">방법을 선택하세요</div>
+        <div class="m-desc-container">
+            <div class="m-marquee" id="mMarquee"></div>
+        </div>
     </div>
 
     <button class="gen" id="genBtn">번호 생성</button>
@@ -272,14 +295,12 @@
     </div>
 
     <div class="sp-bot"></div>
-
-    <div class="spon">
-        <div class="spon-t">후원 계좌: 카카오뱅크 3333-35-8084358</div>
-        <div class="spon-d">에듀크립트 솔루션즈</div>
-    </div>
 </div>
 
 <script>
+// ===== SPONSOR INFO =====
+const SPONSOR_INFO = " | 후원 계좌: 카카오뱅크 3333-35-8084358 (에듀크립트 솔루션즈) | ";
+
 // ===== CONFETTI =====
 const Confetti=(()=>{const cv=document.getElementById('confetti'),cx=cv.getContext('2d');let ps=[],raf=null;const cs=['#5b6ef5','#ff6b9d','#ff9a56','#2dd4a8','#38c9ff','#ffd43b','#b18cff'];function rz(){cv.width=innerWidth;cv.height=innerHeight}addEventListener('resize',rz);rz();function mk(n=60){for(let i=0;i<n;i++)ps.push({x:Math.random()*cv.width,y:-10-Math.random()*40,w:4+Math.random()*6,h:3+Math.random()*4,c:cs[Math.random()*cs.length|0],vy:2+Math.random()*3,vx:(Math.random()-.5)*3,rot:Math.random()*360,rv:(Math.random()-.5)*8,life:1});if(!raf)ani()}function ani(){cx.clearRect(0,0,cv.width,cv.height);ps=ps.filter(p=>p.life>0);if(!ps.length){raf=null;return}ps.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.04;p.rot+=p.rv;p.life-=.006;cx.save();cx.translate(p.x,p.y);cx.rotate(p.rot*Math.PI/180);cx.globalAlpha=Math.min(1,p.life*2);cx.fillStyle=p.c;cx.fillRect(-p.w/2,-p.h/2,p.w,p.h);cx.restore()});raf=requestAnimationFrame(ani)}return{fire:mk}})();
 
@@ -394,7 +415,7 @@ function createPicker(id,opts,defIdx,onSelect){
 // ===== TABS =====
 document.querySelectorAll('.cat').forEach(tab=>{tab.addEventListener('click',()=>{Haptic.medium();Sound.select();document.querySelectorAll('.cat').forEach(t=>t.classList.remove('active'));tab.classList.add('active');curCat=tab.dataset.cat;rebuildMethod()})});
 function rebuildMethod(){const keys=CATS[curCat],opts=keys.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc()})}
-function updateDesc(){const d=document.getElementById('mDesc');if(G[selMethod])d.textContent=G[selMethod].desc}
+function updateDesc(){const d=document.getElementById('mMarquee');if(G[selMethod]){const txt = G[selMethod].desc + SPONSOR_INFO; d.textContent = txt + txt + txt}}
 const setCounts=[];for(let i=1;i<=10;i++)setCounts.push({value:i,label:i+'세트'});
 createPicker('setCountPicker',setCounts,4,v=>selSets=parseInt(v));
 rebuildMethod();
