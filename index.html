@@ -38,7 +38,7 @@
             padding:0;
             padding-bottom:env(safe-area-inset-bottom,0);
         }
-        .sp-bot{flex:1;min-height:8px}
+        .sp-bot{flex:0 0 8px}
 
         /* ===== HEADER ===== */
         .hdr{text-align:center;padding:14px 10px 4px;flex-shrink:0}
@@ -139,13 +139,14 @@
 
         /* ===== RESULTS (숨겨졌다가 생성 시 나타남) ===== */
         .res{
-            flex-shrink:0;overflow:hidden;
+            overflow:hidden;
             border-radius:18px;
-            transition:max-height .4s ease, opacity .3s ease, margin .3s ease;
+            transition:opacity .3s ease, margin .3s ease;
         }
-        .res.empty{max-height:0;opacity:0;margin:0}
+        .res.empty{max-height:0;opacity:0;margin:0;flex:0 0 0}
         .res.has-results{
-            max-height:45vh;opacity:1;margin:0 6px 6px;
+            flex:1;min-height:0;opacity:1;margin:0 6px 6px;
+            display:flex;flex-direction:column;
             background:var(--card);
             box-shadow:0 4px 20px rgba(91,110,245,.1);
             border:1px solid var(--border);
@@ -165,8 +166,8 @@
         }
         .clr-btn:active{background:#fee;color:var(--pink);border-color:var(--pink)}
         .res-scroll{
+            flex:1;min-height:0;
             overflow-y:auto;padding:8px 10px;
-            max-height:calc(45vh - 44px);
             overscroll-behavior:contain;
         }
         .res-scroll::-webkit-scrollbar{width:4px}
@@ -227,7 +228,7 @@
             .sp-bot{flex:.2}
             .ctrl{padding:8px;margin:4px 6px}.pk-box{height:90px}.pk-item{height:36px}.pk-hl{height:36px}
             .gen{padding:12px;margin:4px 6px}
-            .res.has-results{max-height:30vh}
+            .res.has-results{flex:1;min-height:0}
         }
         *{scrollbar-width:thin;scrollbar-color:rgba(91,110,245,.12) transparent}
     </style>
