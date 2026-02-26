@@ -110,13 +110,13 @@
             z-index:10;
         }
         .pk-scroll{
-            height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;
+            height:100%;overflow-y:hidden;
             -webkit-overflow-scrolling:touch;transform-style:preserve-3d;
         }
         .pk-scroll::-webkit-scrollbar{display:none}
         .pk-item{
             height:clamp(36px,7vh,60px);display:flex;align-items:center;justify-content:center;
-            scroll-snap-align:center;font-size:clamp(1.1rem,2.8vw,1.8rem);color:var(--t3);
+            font-size:clamp(1.1rem,2.8vw,1.8rem);color:var(--t3);
             transition:all .25s ease;cursor:pointer;padding:0 6px;
             backface-visibility:hidden;
         }
@@ -415,7 +415,9 @@ let curCat='basic',selMethod='90',selSets=5;
 function createPicker(id,opts,defIdx,onSelect){
     const el=document.getElementById(id);
     const cnt=opts.length,cl=Math.min(3,cnt);
-    let val=opts[defIdx].value,scrolling=false,lastVal=null;
+    let val=opts[defIdx].value,lastVal=null;
+    let curIdx=defIdx; // 현재 선택된 실제 인덱스
+    const DAMP=0.5; // 터치 감도 — 0.5 = 절반
     el.innerHTML='';
     const mk=(o,ri,clone)=>{const d=document.createElement('div');d.className='pk-item'+(clone?' clone':'');d.dataset.value=o.value;d.dataset.ri=ri;d.textContent=o.label;return d};
     for(let i=cnt-cl;i<cnt;i++)el.appendChild(mk(opts[i],i,true));
@@ -423,7 +425,7 @@ function createPicker(id,opts,defIdx,onSelect){
     for(let i=0;i<cl;i++)el.appendChild(mk(opts[i],i,true));
     const items=el.querySelectorAll('.pk-item');
 
-    function getIH(){return items[0].offsetHeight || 80}
+    function getIH(){return items[0].offsetHeight || 60}
 
     function upd(){
         const ih=getIH();
@@ -439,43 +441,85 @@ function createPicker(id,opts,defIdx,onSelect){
         });
     }
 
-    function scr(){
-        if(scrolling)return;
+    // 무한 루프 보정
+    function wrapScroll(){
         const ih=getIH();
         const st=el.scrollTop;
-        if(st<(cl-1)*ih){
-            scrolling=true;el.scrollTop=st+cnt*ih;setTimeout(()=>scrolling=false,50);
-        }else if(st>(cl+cnt-1)*ih){
-            scrolling=true;el.scrollTop=st-cnt*ih;setTimeout(()=>scrolling=false,50);
-        }
+        if(st<(cl-1)*ih){el.scrollTop=st+cnt*ih}
+        else if(st>(cl+cnt-1)*ih){el.scrollTop=st-cnt*ih}
+    }
+
+    function snapTo(idx,smooth){
+        const ih=getIH();
+        const top=(cl+idx)*ih;
+        if(smooth){el.scrollTo({top,behavior:'smooth'})}
+        else{el.scrollTop=top}
+        curIdx=idx;
         upd();
     }
+
+    function snapNearest(smooth){
+        const ih=getIH();
+        const rawIdx=Math.round(el.scrollTop/ih)-cl;
+        const snapped=((rawIdx%cnt)+cnt)%cnt;
+        snapTo(snapped,smooth);
+    }
+
+    // ===== 커스텀 터치 핸들러 (감도 절반) =====
+    let touchY=0,startTop=0,isTouching=false;
+
+    el.addEventListener('touchstart',function(e){
+        touchY=e.touches[0].clientY;
+        startTop=el.scrollTop;
+        isTouching=true;
+    },{passive:true});
+
+    el.addEventListener('touchmove',function(e){
+        if(!isTouching)return;
+        e.preventDefault();
+        const dy=touchY-e.touches[0].clientY;
+        el.scrollTop=startTop+dy*DAMP; // 감도 적용
+        wrapScroll();
+        upd();
+    },{passive:false});
+
+    el.addEventListener('touchend',function(){
+        if(!isTouching)return;
+        isTouching=false;
+        snapNearest(true);
+    },{passive:true});
+
+    // 마우스 휠 (데스크톱)
+    el.addEventListener('wheel',function(e){
+        e.preventDefault();
+        el.scrollTop+=e.deltaY*DAMP;
+        wrapScroll();
+        upd();
+        clearTimeout(el._wheelTimer);
+        el._wheelTimer=setTimeout(()=>snapNearest(true),120);
+    },{passive:false});
+
+    // 클릭으로 선택
+    items.forEach(it=>{
+        it.addEventListener('click',()=>{
+            Haptic.light();Sound.click();
+            snapTo(parseInt(it.dataset.ri),true);
+        });
+    });
 
     function refresh(){
         const ih=getIH();
         el.style.padding=Math.floor((el.parentElement.clientHeight-ih)/2)+'px 0';
-        // 현재 선택된 값의 위치로 스크롤 복구
-        let targetIdx = opts.findIndex(o => o.value === val);
-        if(targetIdx===-1) targetIdx = defIdx;
-        el.scrollTop=(cl+targetIdx)*ih;
-        upd();
+        let targetIdx=opts.findIndex(o=>o.value===val);
+        if(targetIdx===-1)targetIdx=defIdx;
+        curIdx=targetIdx;
+        snapTo(curIdx,false);
     }
 
-    el.addEventListener('scroll',scr);
-    items.forEach(it=>{
-        it.addEventListener('click',()=>{
-            Haptic.light();Sound.click();
-            const ih=getIH();
-            el.scrollTo({top:(cl+parseInt(it.dataset.ri))*ih,behavior:'smooth'});
-        });
-    });
-
-    window.addEventListener('resize', refresh);
-    if(window.visualViewport) window.visualViewport.addEventListener('resize', refresh);
-    // 초기화
-    setTimeout(refresh, 100);
-    // 인앱 브라우저는 로딩 후 뷰포트가 바뀔 수 있으므로 추가 갱신
-    setTimeout(refresh, 500);
+    window.addEventListener('resize',refresh);
+    if(window.visualViewport)window.visualViewport.addEventListener('resize',refresh);
+    setTimeout(refresh,100);
+    setTimeout(refresh,500);
 
     return()=>val;
 }
