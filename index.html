@@ -56,33 +56,6 @@
         @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
         .hdr .sub{font-size:1.05rem;color:var(--t3);margin-top:8px;letter-spacing:4px;font-weight:400}
 
-        /* ===== CATEGORY TABS ===== */
-        .cats{
-            display:flex;gap:10px;flex-shrink:0;
-            overflow-x:auto;scrollbar-width:none;
-            padding:clamp(6px,1vh,15px) 6px;
-        }
-        .cats::-webkit-scrollbar{display:none}
-        .cat{
-            flex-shrink:0;padding:clamp(8px,1.5vh,16px) clamp(16px,3.5vw,28px);
-            border-radius:36px;border:1.5px solid var(--border);
-            background:var(--card);color:var(--t2);
-            font-size:clamp(1.3rem,3.8vw,2.8rem);font-weight:600;
-            font-family:'Noto Sans KR',sans-serif;
-            cursor:pointer;white-space:nowrap;
-            transition:all .25s cubic-bezier(.34,1.56,.64,1);
-            box-shadow:0 8px 0 rgba(0,0,0,.05), 0 15px 20px rgba(0,0,0,.1);
-            position:relative;top:0;
-            touch-action:manipulation;
-        }
-        .cat.active{
-            background:linear-gradient(135deg,var(--pri),var(--pri-lt));
-            color:#fff;border-color:transparent;
-            box-shadow:0 10px 0 #3f4fb5, 0 20px 35px rgba(91,110,245,.4);
-            transform:translateY(-4px);
-        }
-        .cat:active{transform:translateY(6px);box-shadow:0 4px 0 #3f4fb5, 0 8px 15px rgba(0,0,0,.2)}
-
         /* ===== CONTROLS ===== */
         .ctrl{
             flex-shrink:0;
@@ -240,7 +213,6 @@
         @media (min-width:500px){.app{width:100%;max-width:100%;margin:0;padding:0}.b{width:100px;height:100px;font-size:2.2rem}}
         @media (max-width:360px){
             .hdr h1{font-size:2.8rem}
-            .cat{padding:7px 14px;font-size:1.2rem}
             .pk-box{height:clamp(90px,18vh,180px)}
             .pk-item{height:clamp(30px,5.5vh,48px);font-size:1rem}.pk-item.active{font-size:1.2rem}.pk-hl{height:clamp(30px,5.5vh,48px)}
             .b{width:46px;height:46px;font-size:1.15rem}.balls{gap:5px}
@@ -251,9 +223,6 @@
             .hdr{padding:6px 0 2px}
             .hdr h1{font-size:clamp(1.8rem,10vw,3rem)}
             .hdr .sub{font-size:.8rem;margin-top:2px;letter-spacing:2px}
-            .cats{padding:5px 6px;gap:6px}
-            .cat{padding:7px 14px;font-size:1.2rem;box-shadow:0 4px 0 rgba(0,0,0,.05),0 8px 12px rgba(0,0,0,.08)}
-            .cat.active{box-shadow:0 5px 0 #3f4fb5,0 10px 20px rgba(91,110,245,.3);transform:translateY(-2px)}
             .ctrl{padding:6px 8px;margin:4px 0}
             .pk-box{height:clamp(90px,18vh,160px)}
             .pk-item{height:clamp(30px,5.5vh,48px);font-size:1rem}
@@ -274,10 +243,6 @@
             .hdr{padding:2px 0 0}
             .hdr h1{font-size:clamp(1.2rem,4vw,2rem);line-height:1.1}
             .hdr .sub{display:none}
-            .cats{padding:4px 6px;gap:6px}
-            .cat{padding:5px 12px;font-size:1rem;border-radius:20px;
-                box-shadow:0 3px 0 rgba(0,0,0,.05),0 6px 10px rgba(0,0,0,.06)}
-            .cat.active{box-shadow:0 4px 0 #3f4fb5,0 8px 15px rgba(91,110,245,.25);transform:translateY(-1px)}
             .ctrl{padding:4px 6px;margin:2px 0}
             .pk-row{gap:8px}
             .pk-box{height:clamp(70px,22vh,120px);border-radius:12px}
@@ -305,14 +270,6 @@
     <header class="hdr">
         <h1>로또 오라클</h1>
     </header>
-
-    <div class="cats">
-        <button class="cat active" data-cat="basic">기본</button>
-        <button class="cat" data-cat="frequency">빈도/간격</button>
-        <button class="cat" data-cat="pattern">패턴</button>
-        <button class="cat" data-cat="advanced">고급 통계</button>
-        <button class="cat" data-cat="filter">필터링</button>
-    </div>
 
     <div class="ctrl">
         <div class="pk-row">
@@ -407,9 +364,9 @@ const G={
     acvalue:{name:'AC값 최적화',desc:'AC값 7~10 범위 조합만 선택. 역대 당첨의 80%가 이 범위.',fn(){for(let a=0;a<10000;a++){const s=new Set();while(s.size<6)s.add(Math.floor(Math.random()*45)+1);const arr=[...s].sort((a,b)=>a-b);if(Stats.calcAC(arr)>=7&&Stats.calcAC(arr)<=10&&Stats.isValidPattern(arr))return arr}return G.random.fn()}}
 };
 
-// ===== CATEGORIES =====
-const CATS={basic:['90','random','oddeven','highlow','section'],frequency:['frequency','gap','movingavg'],pattern:['association','oddeven','section'],advanced:['poisson','montecarlo','entropy','acvalue'],filter:['sumrange','elimination','acvalue']};
-let curCat='basic',selMethod='90',selSets=5;
+// ===== METHOD LIST =====
+const ALL_METHODS=['90','random','oddeven','highlow','section','frequency','gap','movingavg','association','poisson','montecarlo','entropy','acvalue','sumrange','elimination'];
+let selMethod='90',selSets=5;
 
 // ===== PICKER =====
 function createPicker(id,opts,defIdx,onSelect){
@@ -524,13 +481,12 @@ function createPicker(id,opts,defIdx,onSelect){
     return()=>val;
 }
 
-// ===== TABS =====
-document.querySelectorAll('.cat').forEach(tab=>{tab.addEventListener('click',()=>{Haptic.medium();Sound.select();document.querySelectorAll('.cat').forEach(t=>t.classList.remove('active'));tab.classList.add('active');curCat=tab.dataset.cat;rebuildMethod()})});
-function rebuildMethod(){const keys=CATS[curCat],opts=keys.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc()})}
+// ===== INIT METHOD PICKER =====
+function initMethodPicker(){const opts=ALL_METHODS.map(k=>({value:k,label:G[k].name}));selMethod=opts[0].value;updateDesc();createPicker('methodPicker',opts,0,v=>{selMethod=v;updateDesc()})}
 function updateDesc(){const d=document.getElementById('mMarquee');if(G[selMethod]){const txt = G[selMethod].desc + SPONSOR_INFO; d.textContent = txt + txt + txt}}
 const setCounts=[];for(let i=1;i<=10;i++)setCounts.push({value:i,label:i+'세트'});
 createPicker('setCountPicker',setCounts,4,v=>selSets=parseInt(v));
-rebuildMethod();
+initMethodPicker();
 
 // ===== GENERATE =====
 const genBtn=document.getElementById('genBtn');
